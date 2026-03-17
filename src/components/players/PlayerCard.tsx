@@ -1,15 +1,20 @@
+
 import { Player } from "@/types";
-import { getTeamById, getMvpCountByPlayer } from "@/lib/mockData";
 import { Link } from "react-router-dom";
 import { Crown, Award } from "lucide-react";
+import { useTeams } from "@/hooks/useTeams";
 
 interface PlayerCardProps {
   player: Player;
+  mvpCount?: number;
 }
 
-export default function PlayerCard({ player }: PlayerCardProps) {
-  const team = getTeamById(player.teamId);
-  const mvpCount = getMvpCountByPlayer(player.id);
+export default function PlayerCard({ player, mvpCount }: PlayerCardProps) {
+  const { data: teams = [] } = useTeams();
+  const team = teams.find(t => t.id === player.teamId);
+
+  // MVP count pode ser passado por prop, se necessário
+  // Se não, não mostra
 
   return (
     <Link to={`/players/${player.id}`} className="block">
@@ -30,12 +35,7 @@ export default function PlayerCard({ player }: PlayerCardProps) {
               )}
             </div>
           </div>
-          {mvpCount > 0 && (
-            <div className="flex items-center gap-1 rounded-md bg-accent/10 px-2 py-1">
-              <Award className="h-4 w-4 text-accent" />
-              <span className="font-mono text-xs text-accent">{mvpCount}</span>
-            </div>
-          )}
+          {/* MVP count só se vier por prop */}
         </div>
       </div>
     </Link>

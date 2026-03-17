@@ -2,12 +2,12 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import { Calendar, Trophy, Users, User, Swords, LayoutDashboard, ArrowLeft } from "lucide-react";
 
 const adminNav = [
-  { path: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { path: "/admin/seasons", label: "Seasons", icon: Calendar },
-  { path: "/admin/championships", label: "Championships", icon: Trophy },
-  { path: "/admin/teams", label: "Teams", icon: Users },
-  { path: "/admin/players", label: "Players", icon: User },
-  { path: "/admin/matches", label: "Matches", icon: Swords },
+  { path: "/admin", label: "Painel", icon: LayoutDashboard },
+  { path: "/admin/seasons", label: "Temporadas", icon: Calendar },
+  { path: "/admin/championships", label: "Campeonatos", icon: Trophy },
+  { path: "/admin/teams", label: "Times", icon: Users },
+  { path: "/admin/players", label: "Jogadores", icon: User },
+  { path: "/admin/matches", label: "Partidas", icon: Swords },
 ];
 
 export default function AdminLayout() {
@@ -18,9 +18,9 @@ export default function AdminLayout() {
       {/* Sidebar */}
       <aside className="w-56 shrink-0 border-r border-border bg-surface p-4 hidden md:block">
         <Link to="/" className="flex items-center gap-1 font-mono text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground mb-6">
-          <ArrowLeft className="h-3 w-3" /> Back to site
+          <ArrowLeft className="h-3 w-3" /> Voltar ao site
         </Link>
-        <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-4">Admin Panel</p>
+        <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-4">Painel Admin</p>
         <nav className="flex flex-col gap-1">
           {adminNav.map(item => {
             const isActive = location.pathname === item.path;

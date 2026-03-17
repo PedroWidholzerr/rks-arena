@@ -4,10 +4,10 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const navItems = [
-  { path: "/", label: "Home", icon: Trophy },
-  { path: "/championships", label: "Championships", icon: Swords },
-  { path: "/teams", label: "Teams", icon: Users },
-  { path: "/players", label: "Players", icon: User },
+  { path: "/", label: "Início", icon: Trophy },
+  { path: "/championships", label: "Campeonatos", icon: Swords },
+  { path: "/teams", label: "Times", icon: Users },
+  { path: "/players", label: "Jogadores", icon: User },
 ];
 
 export default function Navbar() {

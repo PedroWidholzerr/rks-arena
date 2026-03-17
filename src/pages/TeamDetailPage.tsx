@@ -1,5 +1,9 @@
 import { useParams, Link } from "react-router-dom";
-import { getTeamById, getPlayersByTeam, getMatchesByTeam, getChampionshipsByTeam, getChampionshipById } from "@/lib/mockData";
+import { useTeam } from "@/hooks/useTeams";
+import { usePlayersByTeamId } from "@/hooks/usePlayersHook";
+import { useMatchesByTeamId } from "@/hooks/useMatches";
+import { useStandingsByChampionshipId } from "@/hooks/useStandings";
+import { useChampionships } from "@/hooks/useChampionships";
 import { TeamLogo } from "@/components/teams/TeamCard";
 import PlayerCard from "@/components/players/PlayerCard";
 import MatchCard from "@/components/matches/MatchCard";
@@ -8,25 +12,34 @@ import { motion } from "framer-motion";
 
 export default function TeamDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const team = getTeamById(id!);
+  const { data: team, isLoading } = useTeam(id!);
+  const { data: teamPlayers = [] } = usePlayersByTeamId(id!);
+  const { data: teamMatches = [] } = useMatchesByTeamId(id!);
+  const { data: championships = [] } = useChampionships();
 
-  if (!team) {
+  if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-20 text-center">
-        <p className="text-muted-foreground">Team not found.</p>
-        <Link to="/teams" className="text-primary mt-4 inline-block">← Back</Link>
+        <p className="text-muted-foreground">Carregando...</p>
       </div>
     );
   }
 
-  const teamPlayers = getPlayersByTeam(team.id);
-  const teamMatches = getMatchesByTeam(team.id);
-  const champHistory = getChampionshipsByTeam(team.id);
+  if (!team) {
+    return (
+      <div className="container mx-auto px-4 py-20 text-center">
+        <p className="text-muted-foreground">Time não encontrado.</p>
+        <Link to="/teams" className="text-primary mt-4 inline-block">← Voltar</Link>
+      </div>
+    );
+  }
+
+  const playedMatches = teamMatches.filter(m => m.scoreA > 0 || m.scoreB > 0);
 
   return (
     <div className="container mx-auto px-4 py-10">
       <Link to="/teams" className="flex items-center gap-1 font-mono text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground mb-6">
-        <ArrowLeft className="h-3 w-3" /> Teams
+        <ArrowLeft className="h-3 w-3" /> Times
       </Link>
 
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
@@ -44,44 +57,22 @@ export default function TeamDetailPage() {
 
       {/* Players */}
       <section className="mt-10">
-        <h2 className="font-display text-2xl font-bold uppercase tracking-tighter text-foreground mb-4">Roster</h2>
-        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          {teamPlayers.map(p => <PlayerCard key={p.id} player={p} />)}
-        </div>
+        <h2 className="font-display text-2xl font-bold uppercase tracking-tighter text-foreground mb-4">Elenco</h2>
+        {teamPlayers.length > 0 ? (
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+            {teamPlayers.map(p => <PlayerCard key={p.id} player={p} />)}
+          </div>
+        ) : (
+          <p className="text-muted-foreground text-sm">Nenhum jogador cadastrado.</p>
+        )}
       </section>
 
-      {/* Championship History */}
-      {champHistory.length > 0 && (
-        <section className="mt-10">
-          <h2 className="font-display text-2xl font-bold uppercase tracking-tighter text-foreground mb-4">Championship History</h2>
-          <div className="grid gap-3 md:grid-cols-2">
-            {champHistory.map(ct => (
-              <Link key={ct.id} to={`/championships/${ct.championshipId}`}>
-                <div className="esports-card p-4 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Trophy className="h-4 w-4 text-primary" />
-                    <span className="font-display text-sm font-semibold text-foreground">{ct.championship.name}</span>
-                  </div>
-                  <div className="font-mono text-sm">
-                    <span className="win-text">W {ct.wins}</span>
-                    <span className="text-muted-foreground mx-1">-</span>
-                    <span className="loss-text">L {ct.losses}</span>
-                    <span className="text-muted-foreground mx-2">|</span>
-                    <span className="text-foreground font-bold">{ct.points} PTS</span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
       {/* Match History */}
-      {teamMatches.length > 0 && (
+      {playedMatches.length > 0 && (
         <section className="mt-10">
-          <h2 className="font-display text-2xl font-bold uppercase tracking-tighter text-foreground mb-4">Match History</h2>
+          <h2 className="font-display text-2xl font-bold uppercase tracking-tighter text-foreground mb-4">Histórico de Partidas</h2>
           <div className="grid gap-3">
-            {teamMatches.map(m => <MatchCard key={m.id} match={m} />)}
+            {playedMatches.map(m => <MatchCard key={m.id} match={m} />)}
           </div>
         </section>
       )}

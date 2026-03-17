@@ -1,5 +1,5 @@
 import { ChampionshipTeam } from "@/types";
-import { getTeamById } from "@/lib/mockData";
+import { useTeams } from "@/hooks/useTeams";
 import { TeamLogo } from "@/components/teams/TeamCard";
 
 interface StandingsTableProps {
@@ -7,21 +7,23 @@ interface StandingsTableProps {
 }
 
 export default function StandingsTable({ standings }: StandingsTableProps) {
+  const { data: teams = [] } = useTeams();
+
   return (
     <div className="esports-card overflow-hidden">
       <table className="w-full">
         <thead>
           <tr className="border-b border-border bg-background">
             <th className="px-4 py-3 text-left font-mono text-xs uppercase tracking-widest text-muted-foreground">#</th>
-            <th className="px-4 py-3 text-left font-mono text-xs uppercase tracking-widest text-muted-foreground">Team</th>
-            <th className="px-4 py-3 text-center font-mono text-xs uppercase tracking-widest text-muted-foreground">W</th>
-            <th className="px-4 py-3 text-center font-mono text-xs uppercase tracking-widest text-muted-foreground">L</th>
+            <th className="px-4 py-3 text-left font-mono text-xs uppercase tracking-widest text-muted-foreground">Time</th>
+            <th className="px-4 py-3 text-center font-mono text-xs uppercase tracking-widest text-muted-foreground">V</th>
+            <th className="px-4 py-3 text-center font-mono text-xs uppercase tracking-widest text-muted-foreground">D</th>
             <th className="px-4 py-3 text-center font-mono text-xs uppercase tracking-widest text-muted-foreground">PTS</th>
           </tr>
         </thead>
         <tbody>
           {standings.map((entry, index) => {
-            const team = getTeamById(entry.teamId);
+            const team = teams.find(t => t.id === entry.teamId);
             if (!team) return null;
             return (
               <tr

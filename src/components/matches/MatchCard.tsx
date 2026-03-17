@@ -1,5 +1,6 @@
 import { Match } from "@/types";
-import { getTeamById, getPlayerById } from "@/lib/mockData";
+import { useTeams } from "@/hooks/useTeams";
+import { usePlayers } from "@/hooks/usePlayersHook";
 import { TeamLogo } from "@/components/teams/TeamCard";
 import { Calendar, Award } from "lucide-react";
 import { format } from "date-fns";
@@ -9,10 +10,21 @@ interface MatchCardProps {
 }
 
 export default function MatchCard({ match }: MatchCardProps) {
-  const teamA = getTeamById(match.teamAId)!;
-  const teamB = getTeamById(match.teamBId)!;
-  const mvp = match.mvpPlayerId ? getPlayerById(match.mvpPlayerId) : null;
+  const { data: teams = [] } = useTeams();
+  const { data: players = [] } = usePlayers();
+
+  const teamA = teams.find(t => t.id === match.teamAId);
+  const teamB = teams.find(t => t.id === match.teamBId);
+  const mvp = match.mvpPlayerId ? players.find(p => p.id === match.mvpPlayerId) : null;
   const isPlayed = match.scoreA > 0 || match.scoreB > 0;
+
+  if (!teamA || !teamB) {
+    return (
+      <div className="esports-card p-4">
+        <p className="text-sm text-muted-foreground">Carregando partida...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="esports-card p-4">
@@ -60,7 +72,7 @@ export default function MatchCard({ match }: MatchCardProps) {
           </div>
         )}
         {!isPlayed && (
-          <span className="rounded-md bg-muted px-2 py-0.5 font-mono text-xs text-muted-foreground">Scheduled</span>
+          <span className="rounded-md bg-muted px-2 py-0.5 font-mono text-xs text-muted-foreground">Agendada</span>
         )}
       </div>
     </div>
