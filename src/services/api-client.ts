@@ -1,5 +1,16 @@
 // API Client Configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8081/api";
+function resolveApiBaseUrl(rawUrl?: string) {
+  if (!rawUrl?.trim()) {
+    return "http://localhost:8081/api";
+  }
+
+  const normalizedUrl = rawUrl.trim().replace(/\/+$/, "");
+  return normalizedUrl.endsWith("/api")
+    ? normalizedUrl
+    : `${normalizedUrl}/api`;
+}
+
+const API_BASE_URL = resolveApiBaseUrl(import.meta.env.VITE_API_URL);
 
 export interface ApiResponse<T> {
   success: boolean;

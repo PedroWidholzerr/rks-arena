@@ -64,6 +64,24 @@ This project is built with:
 
 Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
 
+## Backend URL configuration
+
+This frontend reads the backend base URL from `VITE_API_URL`.
+
+Example for local development:
+
+```sh
+VITE_API_URL=http://localhost:8081/api
+```
+
+Example for production:
+
+```sh
+VITE_API_URL=https://your-backend.up.railway.app/api
+```
+
+If you provide only the backend origin, the app will append `/api` automatically.
+
 ## Can I connect a custom domain to my Lovable project?
 
 Yes, you can!
