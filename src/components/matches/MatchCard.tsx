@@ -3,10 +3,19 @@ import { useTeams } from "@/hooks/useTeams";
 import { usePlayers } from "@/hooks/usePlayersHook";
 import { TeamLogo } from "@/components/teams/TeamCard";
 import { Calendar, Award } from "lucide-react";
-import { format } from "date-fns";
 
 interface MatchCardProps {
   match: Match;
+}
+
+/** Parse scheduledAt sem conversão de timezone (backend usa LocalDateTime com Z literal) */
+function formatMatchDate(iso: string): string {
+  const clean = iso.replace(/\.?\d*[Zz]$/, "");
+  const [datePart, timePart = "00:00"] = clean.split("T");
+  const [y, m, d] = datePart.split("-");
+  const [hh, mm] = timePart.split(":");
+  const months = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+  return `${months[parseInt(m) - 1]} ${d}, ${y} • ${hh}:${mm}`;
 }
 
 export default function MatchCard({ match }: MatchCardProps) {
@@ -63,7 +72,7 @@ export default function MatchCard({ match }: MatchCardProps) {
       <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
           <Calendar className="h-3 w-3" />
-          <span className="font-mono">{format(new Date(match.scheduledAt), "MMM dd, yyyy • HH:mm")}</span>
+          <span className="font-mono">{formatMatchDate(match.scheduledAt)}</span>
         </div>
         {mvp && (
           <div className="flex items-center gap-1 text-xs">

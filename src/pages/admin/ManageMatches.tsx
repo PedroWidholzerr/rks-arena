@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Match } from "@/types";
-import { Plus, Pencil, Trash2, Award } from "lucide-react";
+import { Plus, Pencil, Trash2, Award, CalendarIcon, Clock } from "lucide-react";
 import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { useMatches, useSaveMatchMutation, useDeleteMatch } from "@/hooks/useMatches";
 import { useChampionships } from "@/hooks/useChampionships";
 import { useTeams } from "@/hooks/useTeams";
@@ -11,6 +12,49 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
+
+/**
+ * O backend usa LocalDateTime com @JsonFormat "yyyy-MM-dd'T'HH:mm:ss[.SSS]'Z'"
+ * O 'Z' é literal — não é timezone. Precisamos tratar como hora local.
+ */
+function parseScheduledAt(iso: string): { date: Date; hour: number; minute: number } {
+  // Remove trailing Z/z (literal, not timezone) and any milliseconds
+  const clean = iso.replace(/\.?\d*[Zz]$/, "");
+  // Parse as "YYYY-MM-DDTHH:mm:ss" → local time parts
+  const parts = clean.split("T");
+  const dateParts = parts[0].split("-");
+  const timeParts = (parts[1] || "00:00:00").split(":");
+  return {
+    date: new Date(
+      parseInt(dateParts[0]),
+      parseInt(dateParts[1]) - 1,
+      parseInt(dateParts[2])
+    ),
+    hour: parseInt(timeParts[0]) || 0,
+    minute: parseInt(timeParts[1]) || 0,
+  };
+}
+
+/** Formata para o padrão que o backend espera: "2026-04-28T17:30:00Z" (Z literal) */
+function formatScheduledAt(date: Date, hour: number, minute: number): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  const hh = String(hour).padStart(2, "0");
+  const mm = String(minute).padStart(2, "0");
+  return `${y}-${m}-${d}T${hh}:${mm}:00Z`;
+}
+
+/** Formata para exibição na tabela */
+function displayScheduledAt(iso: string): string {
+  const { date, hour, minute } = parseScheduledAt(iso);
+  date.setHours(hour, minute);
+  return format(date, "dd MMM, HH:mm", { locale: ptBR });
+}
 
 export default function ManageMatches() {
   const { data: items = [], isLoading } = useMatches();
@@ -25,37 +69,45 @@ export default function ManageMatches() {
     championshipId: "",
     teamAId: "",
     teamBId: "",
-    scheduledAt: new Date().toISOString(),
     scoreA: 0,
     scoreB: 0,
     mvpPlayerId: "",
     comment: "",
   });
+  // Estado separado para data/hora — evita conversões de timezone
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedHour, setSelectedHour] = useState(20);
+  const [selectedMinute, setSelectedMinute] = useState(0);
 
   const handleOpenDialog = (item?: Match) => {
     if (item) {
+      const parsed = parseScheduledAt(item.scheduledAt);
       setFormData({
         championshipId: item.championshipId,
         teamAId: item.teamAId,
         teamBId: item.teamBId,
-        scheduledAt: item.scheduledAt,
         scoreA: item.scoreA,
         scoreB: item.scoreB,
         mvpPlayerId: item.mvpPlayerId || "",
         comment: item.comment || "",
       });
+      setSelectedDate(parsed.date);
+      setSelectedHour(parsed.hour);
+      setSelectedMinute(parsed.minute);
       setEditingId(item.id);
     } else {
       setFormData({
         championshipId: "",
         teamAId: "",
         teamBId: "",
-        scheduledAt: new Date().toISOString(),
         scoreA: 0,
         scoreB: 0,
         mvpPlayerId: "",
         comment: "",
       });
+      setSelectedDate(new Date());
+      setSelectedHour(20);
+      setSelectedMinute(0);
       setEditingId(null);
     }
     setOpenDialog(true);
@@ -66,7 +118,10 @@ export default function ManageMatches() {
     
     await saveMutation.mutateAsync({
       id: editingId || undefined,
-      data: formData,
+      data: {
+        ...formData,
+        scheduledAt: formatScheduledAt(selectedDate, selectedHour, selectedMinute),
+      },
     });
     setOpenDialog(false);
   };
@@ -130,7 +185,7 @@ export default function ManageMatches() {
                     )}
                   </td>
                   <td className="px-4 py-2 font-mono text-xs text-muted-foreground">
-                    {format(new Date(item.scheduledAt), "MMM dd, HH:mm")}
+                    {displayScheduledAt(item.scheduledAt)}
                   </td>
                   <td className="px-4 py-2">
                     {mvp && (
@@ -236,13 +291,72 @@ export default function ManageMatches() {
               </div>
             </div>
             <div>
-              <Label htmlFor="scheduledAt">Data & Hora</Label>
-              <Input
-                id="scheduledAt"
-                type="datetime-local"
-                value={formData.scheduledAt.slice(0, 16)}
-                onChange={(e) => setFormData({ ...formData, scheduledAt: new Date(e.target.value).toISOString() })}
-              />
+              <Label>Data & Hora</Label>
+              <div className="grid grid-cols-[1fr_auto_auto] gap-2 mt-1.5">
+                {/* Date Picker com Calendar Popover */}
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "justify-start text-left font-normal",
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {format(selectedDate, "dd 'de' MMM, yyyy", { locale: ptBR })}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={(day) => {
+                        if (day) setSelectedDate(day);
+                      }}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+
+                {/* Hora */}
+                <Select
+                  value={String(selectedHour)}
+                  onValueChange={(val) => setSelectedHour(parseInt(val))}
+                >
+                  <SelectTrigger className="w-[80px]">
+                    <Clock className="mr-1 h-3 w-3 text-muted-foreground" />
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <ScrollArea className="h-48">
+                      {Array.from({ length: 24 }, (_, i) => (
+                        <SelectItem key={i} value={String(i)}>
+                          {String(i).padStart(2, "0")}h
+                        </SelectItem>
+                      ))}
+                    </ScrollArea>
+                  </SelectContent>
+                </Select>
+
+                {/* Minuto */}
+                <Select
+                  value={String(selectedMinute)}
+                  onValueChange={(val) => setSelectedMinute(parseInt(val))}
+                >
+                  <SelectTrigger className="w-[80px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <ScrollArea className="h-48">
+                      {[0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55].map((m) => (
+                        <SelectItem key={m} value={String(m)}>
+                          {String(m).padStart(2, "0")}min
+                        </SelectItem>
+                      ))}
+                    </ScrollArea>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <div>
               <Label htmlFor="mvp">Jogador MVP</Label>
