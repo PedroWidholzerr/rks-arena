@@ -9,13 +9,15 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login, isLoading } = useAuth();
+  const { login } = useAuth();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     try {
       await login(email, password);
@@ -30,6 +32,8 @@ export default function LoginPage() {
         description: error.message || "Email ou senha inválidos",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -46,12 +50,14 @@ export default function LoginPage() {
               <Label htmlFor="email">E-mail</Label>
               <Input
                 id="email"
-                type="email"
+                type="text"
+                inputMode="email"
+                autoComplete="email"
                 placeholder="seu@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                disabled={isLoading}
+                disabled={isSubmitting}
               />
             </div>
             <div className="space-y-2">
@@ -63,15 +69,15 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                disabled={isLoading}
+                disabled={isSubmitting}
               />
             </div>
             <Button
               type="submit"
               className="w-full"
-              disabled={isLoading}
+              disabled={isSubmitting}
             >
-              {isLoading ? "Entrando..." : "Entrar"}
+              {isSubmitting ? "Entrando..." : "Entrar"}
             </Button>
           </form>
           <div className="mt-4 text-xs text-muted-foreground text-center">

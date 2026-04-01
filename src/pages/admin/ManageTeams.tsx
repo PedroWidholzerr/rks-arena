@@ -128,13 +128,12 @@ export default function ManageTeams() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-display text-3xl font-bold uppercase tracking-tighter text-foreground">Times</h1>
-        <Button
+        <button
           onClick={() => handleOpenDialog()}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 rounded-md bg-primary/10 px-4 py-2 font-mono text-xs uppercase tracking-wider text-primary transition-colors hover:bg-primary/20"
         >
-          <Plus className="h-4 w-4" />
-          Novo Time
-        </Button>
+          <Plus className="h-4 w-4" /> Novo Time
+        </button>
       </div>
 
       {isLoading ? (

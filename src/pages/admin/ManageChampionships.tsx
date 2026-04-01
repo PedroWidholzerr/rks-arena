@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Championship } from "@/types";
-import { Plus, Pencil, Trash2, Users } from "lucide-react";
-import { useChampionships, useSaveChampionshipMutation, useDeleteChampionship, useChampionshipTeamIds, useSetChampionshipTeams } from "@/hooks/useChampionships";
+import { Plus, Pencil, Trash2, Users, RefreshCw } from "lucide-react";
+import { useChampionships, useSaveChampionshipMutation, useDeleteChampionship, useChampionshipTeamIds, useSetChampionshipTeams, useRecalculateStandings } from "@/hooks/useChampionships";
 import { useSeasons } from "@/hooks/useSeasons";
 import { useTeams } from "@/hooks/useTeams";
 import { Button } from "@/components/ui/button";
@@ -54,6 +54,7 @@ export default function ManageChampionships() {
   const { data: allTeams = [] } = useTeams();
   const saveMutation = useSaveChampionshipMutation();
   const deleteMutation = useDeleteChampionship();
+  const recalculateMutation = useRecalculateStandings();
   const [openDialog, setOpenDialog] = useState(false);
   const [teamsDialogId, setTeamsDialogId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -62,6 +63,10 @@ export default function ManageChampionships() {
     description: "",
     seasonId: seasons[0]?.id || "",
     status: "upcoming" as const,
+    bestOf: 3,
+    pointsPerWin: 2,
+    pointsPerLoss: 0,
+    pointsPerLossDecider: 1,
   });
 
   const handleOpenDialog = (item?: Championship) => {
@@ -70,6 +75,10 @@ export default function ManageChampionships() {
       setFormData({
         ...rest,
         status: item.status as any,
+        bestOf: item.bestOf ?? 3,
+        pointsPerWin: item.pointsPerWin ?? 2,
+        pointsPerLoss: item.pointsPerLoss ?? 0,
+        pointsPerLossDecider: item.pointsPerLossDecider ?? 1,
       });
       setEditingId(item.id);
     } else {
@@ -78,6 +87,10 @@ export default function ManageChampionships() {
         description: "",
         seasonId: seasons[0]?.id || "",
         status: "upcoming",
+        bestOf: 3,
+        pointsPerWin: 2,
+        pointsPerLoss: 0,
+        pointsPerLossDecider: 1,
       });
       setEditingId(null);
     }
@@ -91,6 +104,9 @@ export default function ManageChampionships() {
       id: editingId || undefined,
       data: formData,
     });
+    if (editingId) {
+      recalculateMutation.mutate(editingId);
+    }
     setOpenDialog(false);
   };
 
@@ -137,12 +153,19 @@ export default function ManageChampionships() {
                 <td className="px-4 py-2 text-right">
                   <div className="flex items-center justify-end gap-2">
                     <button
+                      onClick={() => recalculateMutation.mutate(item.id)}
+                      className="rounded-md p-1.5 text-muted-foreground hover:bg-green-500/10 hover:text-green-400"
+                      title="Recalcular Classificação"
+                      disabled={recalculateMutation.isPending}
+                    >
+                      <RefreshCw className={`h-4 w-4 ${recalculateMutation.isPending ? 'animate-spin' : ''}`} />
+                    </button>
+                    <button
                       onClick={() => setTeamsDialogId(item.id)}
                       className="rounded-md p-1.5 text-muted-foreground hover:bg-primary/10 hover:text-primary"
                       title="Gerenciar Times"
                     >
                       <Users className="h-4 w-4" />
-                    </button>
                     <button
                       onClick={() => handleOpenDialog(item)}
                       className="rounded-md p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground"
@@ -215,6 +238,57 @@ export default function ManageChampionships() {
                   <SelectItem value="finished">Finalizado</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+            <div className="border-t border-border pt-4 mt-2">
+              <p className="text-sm font-semibold text-foreground mb-3">Configuração de Pontuação</p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="bestOf">Formato (MD)</Label>
+                  <Select value={String(formData.bestOf)} onValueChange={(value) => setFormData({ ...formData, bestOf: parseInt(value) })}>
+                    <SelectTrigger id="bestOf">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">MD1</SelectItem>
+                      <SelectItem value="3">MD3</SelectItem>
+                      <SelectItem value="5">MD5</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="pointsPerWin">Pts por Vitória</Label>
+                  <Input
+                    id="pointsPerWin"
+                    type="number"
+                    min={0}
+                    value={formData.pointsPerWin}
+                    onChange={(e) => setFormData({ ...formData, pointsPerWin: parseInt(e.target.value) || 0 })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="pointsPerLoss">Pts por Derrota</Label>
+                  <Input
+                    id="pointsPerLoss"
+                    type="number"
+                    min={0}
+                    value={formData.pointsPerLoss}
+                    onChange={(e) => setFormData({ ...formData, pointsPerLoss: parseInt(e.target.value) || 0 })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="pointsPerLossDecider">Pts Derrota (Decisivo)</Label>
+                  <Input
+                    id="pointsPerLossDecider"
+                    type="number"
+                    min={0}
+                    value={formData.pointsPerLossDecider}
+                    onChange={(e) => setFormData({ ...formData, pointsPerLossDecider: parseInt(e.target.value) || 0 })}
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                "Derrota (Decisivo)" = ponto dado ao perdedor quando a série vai ao jogo final (ex: 2-1 na MD3).
+              </p>
             </div>
             <div className="flex gap-2 justify-end">
               <Button variant="outline" onClick={() => setOpenDialog(false)}>

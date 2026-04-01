@@ -12,6 +12,10 @@ export interface Championship {
   description: string;
   seasonId: string;
   status: Status;
+  bestOf: number;
+  pointsPerWin: number;
+  pointsPerLoss: number;
+  pointsPerLossDecider: number;
 }
 
 export interface Team {

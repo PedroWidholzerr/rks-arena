@@ -167,3 +167,27 @@ export function useSetChampionshipTeams() {
     },
   });
 }
+
+export function useRecalculateStandings() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: (championshipId: string) =>
+      championshipService.recalculateStandings(championshipId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["standings"] });
+      toast({
+        title: "Sucesso",
+        description: "Classificação recalculada com sucesso!",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro",
+        description: error.message || "Erro ao recalcular classificação",
+        variant: "destructive",
+      });
+    },
+  });
+}

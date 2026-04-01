@@ -101,6 +101,7 @@ export function useDeleteMatch() {
     mutationFn: (id: string) => matchService.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: MATCHES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ["standings"] });
       toast({
         title: "Sucesso",
         description: "Partida deletada com sucesso!",
@@ -130,6 +131,7 @@ export function useSaveMatchMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: MATCHES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ["standings"] });
       toast({
         title: "Sucesso",
         description: "Partida salva com sucesso!",

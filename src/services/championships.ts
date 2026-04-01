@@ -33,4 +33,8 @@ export const championshipService = {
   setTeams: async (championshipId: string, teamIds: string[]): Promise<void> => {
     return apiClient.put<void>(`/championships/${championshipId}/teams`, { teamIds });
   },
+
+  recalculateStandings: async (championshipId: string): Promise<void> => {
+    return apiClient.post<void>(`/championships/${championshipId}/recalculate`, {});
+  },
 };
