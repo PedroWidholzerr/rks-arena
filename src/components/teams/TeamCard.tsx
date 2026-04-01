@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Users } from "lucide-react";
 import { usePlayers } from "@/hooks/usePlayersHook";
 import { resolveTeamLogoUrl } from "@/services/teams";
+import { useState } from "react";
 
 interface TeamLogoProps {
   team: Team;
@@ -13,13 +14,21 @@ interface TeamLogoProps {
 export function TeamLogo({ team, size = "md" }: TeamLogoProps) {
   const sizes = { sm: "h-8 w-8 text-xs", md: "h-12 w-12 text-sm", lg: "h-20 w-20 text-xl" };
   const logoUrl = resolveTeamLogoUrl(team.logoUrl);
+  const [imgError, setImgError] = useState(false);
 
-  if (logoUrl) {
-    return <img src={logoUrl} alt={team.name} className={`${sizes[size]} rounded-md object-cover`} />;
+  if (logoUrl && !imgError) {
+    return (
+      <img
+        src={logoUrl}
+        alt={team.name}
+        className={`${sizes[size]} shrink-0 rounded-md object-cover`}
+        onError={() => setImgError(true)}
+      />
+    );
   }
 
   return (
-    <div className={`${sizes[size]} flex items-center justify-center rounded-md bg-primary/10 font-mono font-bold text-primary`}>
+    <div className={`${sizes[size]} shrink-0 flex items-center justify-center rounded-md bg-primary/10 font-mono font-bold text-primary`}>
       {team.tag}
     </div>
   );
