@@ -166,6 +166,7 @@ export default function ManageChampionships() {
                       title="Gerenciar Times"
                     >
                       <Users className="h-4 w-4" />
+                    </button>
                     <button
                       onClick={() => handleOpenDialog(item)}
                       className="rounded-md p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground"
