@@ -34,18 +34,21 @@ export default function TeamCard({ team }: TeamCardProps) {
   const teamPlayers = players.filter(p => p.teamId === team.id);
   const captain = teamPlayers.find(p => p.isCaptain);
 
+  // Remove trailing commas/spaces from description
+  const cleanDescription = team.description?.replace(/[,\s]+$/, "") || "";
+
   return (
-    <Link to={`/teams/${team.id}`} className="block">
-      <div className="esports-card p-5 transition-all hover:scale-[1.02]">
-        <div className="flex items-start gap-4">
+    <Link to={`/teams/${team.id}`} className="block h-full">
+      <div className="esports-card p-5 transition-all hover:scale-[1.02] h-full flex flex-col">
+        <div className="flex items-start gap-4 flex-1 min-h-0">
           <TeamLogo team={team} size="lg" />
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <h3 className="font-display text-lg font-bold tracking-tight text-foreground">{team.name}</h3>
-              <span className="tag-badge">{team.tag}</span>
+          <div className="flex-1 min-w-0 flex flex-col">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="font-display text-lg font-bold tracking-tight text-foreground truncate">{team.name}</h3>
+              <span className="tag-badge shrink-0">{team.tag}</span>
             </div>
-            <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{team.description}</p>
-            <div className="mt-3 flex items-center gap-3">
+            <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{cleanDescription}</p>
+            <div className="mt-auto pt-3 flex items-center gap-3">
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 <Users className="h-3 w-3" />
                 <span className="font-mono">{isLoading ? '-' : teamPlayers.length} jogadores</span>
