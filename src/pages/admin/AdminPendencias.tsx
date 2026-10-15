@@ -43,7 +43,7 @@ export function AdminPendencias() {
       <div className="space-y-6">
         {semResultado.length > 0 ? (
           <section aria-labelledby="sem-resultado" className="space-y-2">
-            <h2 id="sem-resultado" className="text-lg font-semibold">
+            <h2 id="sem-resultado" className="font-display text-lg font-bold uppercase tracking-tight text-foreground">
               Partidas passadas sem resultado (<span className="numero">{semResultado.length}</span>)
             </h2>
             <ul className="divide-y divide-border rounded-md border border-border bg-card">
@@ -67,7 +67,7 @@ export function AdminPendencias() {
         ) : null}
         {empates.length > 0 ? (
           <section aria-labelledby="empates" className="space-y-2">
-            <h2 id="empates" className="text-lg font-semibold">
+            <h2 id="empates" className="font-display text-lg font-bold uppercase tracking-tight text-foreground">
               Empates a decidir (<span className="numero">{empates.length}</span>)
             </h2>
             <ul className="divide-y divide-border rounded-md border border-border bg-card">
@@ -86,7 +86,7 @@ export function AdminPendencias() {
         ) : null}
         {semTimes.length > 0 ? (
           <section aria-labelledby="sem-times" className="space-y-2">
-            <h2 id="sem-times" className="text-lg font-semibold">
+            <h2 id="sem-times" className="font-display text-lg font-bold uppercase tracking-tight text-foreground">
               Campeonatos sem Times (<span className="numero">{semTimes.length}</span>)
             </h2>
             <ul className="divide-y divide-border rounded-md border border-border bg-card">

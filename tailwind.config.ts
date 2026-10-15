@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 
-// Cores como "H S% L%" nas variáveis de src/index.css (tokens do DESIGN.md). O <alpha-value> mantém
+// Cores como "H S% L%" nas variáveis de src/index.css (visual escuro com ciano neon). O <alpha-value> mantém
 // funcionando os modificadores de opacidade do shadcn, como bg-primary/90.
 const cor = (variavel: string) => `hsl(var(--${variavel}) / <alpha-value>)`;
 
@@ -11,13 +11,14 @@ export default {
   theme: {
     container: {
       center: true,
-      padding: { DEFAULT: "1rem", sm: "1.5rem" },
-      screens: { "2xl": "1120px" },
+      padding: { DEFAULT: "1rem", sm: "1.5rem", lg: "2rem" },
+      screens: { "2xl": "1400px" },
     },
     extend: {
       fontFamily: {
-        // A única família é Inter, com system-ui como reserva (DESIGN.md, Typography).
         sans: ["Inter", "system-ui", "-apple-system", "Segoe UI", "sans-serif"],
+        display: ["Inter", "system-ui", "sans-serif"],
+        mono: ["JetBrains Mono", "ui-monospace", "monospace"],
       },
       colors: {
         border: cor("border"),
@@ -73,10 +74,13 @@ export default {
         toque: "44px",
       },
       boxShadow: {
-        // Única sombra do sistema: popovers, menus, diálogos e a gaveta móvel.
         flutuante: "var(--sombra-flutuante)",
       },
       keyframes: {
+        "pulse-glow": {
+          "0%, 100%": { opacity: "0.4" },
+          "50%": { opacity: "1" },
+        },
         "accordion-down": {
           from: { height: "0" },
           to: { height: "var(--radix-accordion-content-height)" },
@@ -87,6 +91,7 @@ export default {
         },
       },
       animation: {
+        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },

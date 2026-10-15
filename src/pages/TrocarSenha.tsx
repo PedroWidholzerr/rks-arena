@@ -5,7 +5,6 @@ import { Alerta } from "@/components/Alerta";
 import { CabecalhoDePagina } from "@/components/CabecalhoDePagina";
 import { Marca } from "@/components/layout/Marca";
 import { PularParaConteudo } from "@/components/layout/PularParaConteudo";
-import { TemaToggle } from "@/components/layout/TemaToggle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -53,13 +52,12 @@ export default function TrocarSenha() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background to-secondary p-4 text-foreground">
       <PularParaConteudo />
-      <header className="container flex h-14 items-center justify-between">
-        <Marca />
-        <TemaToggle />
-      </header>
-      <main id="conteudo" tabIndex={-1} className="container max-w-formulario py-8 focus:outline-none">
+      <main id="conteudo" tabIndex={-1} className="esports-card w-full max-w-md space-y-4 p-6 focus:outline-none">
+        <div className="flex justify-center">
+          <Marca />
+        </div>
         <CabecalhoDePagina
           titulo={obrigatoria ? "Troque sua senha" : "Trocar senha"}
           descricao={obrigatoria ? "Por segurança, troque a senha temporária antes de continuar." : undefined}

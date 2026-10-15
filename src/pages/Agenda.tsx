@@ -59,7 +59,7 @@ function PartidasDaAgenda({ campeonatos }: { campeonatos: Campeonato[] }) {
       ) : (
         dias.map((chave) => (
           <section key={chave} aria-labelledby={`dia-${chave}`}>
-            <h2 id={`dia-${chave}`} className="mb-2 font-semibold capitalize">
+            <h2 id={`dia-${chave}`} className="mb-3 font-display text-lg font-bold uppercase tracking-tight text-foreground">
               {chave === "sem-horario" ? "Sem horário" : rotuloDoDia(chave)}
             </h2>
             <div className="grid gap-3 md:grid-cols-2">

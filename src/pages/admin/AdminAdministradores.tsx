@@ -146,7 +146,7 @@ export function AdminAdministradores() {
         </EstadoDaConsulta>
 
         <section aria-labelledby="exportar" className="space-y-2 rounded-md border border-border bg-card p-4">
-          <h2 id="exportar" className="text-lg font-semibold">
+          <h2 id="exportar" className="font-display text-lg font-bold uppercase tracking-tight text-foreground">
             Exportar dados
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -159,7 +159,7 @@ export function AdminAdministradores() {
         </section>
 
         <section aria-labelledby="senha" className="space-y-2 rounded-md border border-border bg-card p-4">
-          <h2 id="senha" className="text-lg font-semibold">
+          <h2 id="senha" className="font-display text-lg font-bold uppercase tracking-tight text-foreground">
             Sua senha
           </h2>
           <Button asChild variant="secondary" className="min-h-toque">

@@ -132,7 +132,7 @@ function AbaPartidas({ campeonatoId }: { campeonatoId: string }) {
               .sort(([a], [b]) => a - b)
               .map(([rodada, partidas]) => (
                 <section key={rodada} aria-labelledby={`rodada-${rodada}`}>
-                  <h3 id={`rodada-${rodada}`} className="mb-2 font-semibold">
+                  <h3 id={`rodada-${rodada}`} className="mb-3 font-display text-lg font-bold uppercase tracking-tight text-foreground">
                     Rodada <span className="numero">{rodada}</span>
                   </h3>
                   <div className="grid gap-3 md:grid-cols-2">

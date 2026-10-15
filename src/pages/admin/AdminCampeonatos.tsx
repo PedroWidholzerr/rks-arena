@@ -218,7 +218,7 @@ function SecaoDaTemporada({ temporada }: { temporada: Temporada }) {
   return (
     <section aria-labelledby={`temporada-${temporada.id}`} className="rounded-md border border-border bg-card p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 id={`temporada-${temporada.id}`} className="flex items-center gap-2 text-lg font-semibold">
+        <h2 id={`temporada-${temporada.id}`} className="flex items-center gap-2 font-display text-lg font-bold uppercase tracking-tight text-foreground">
           {temporada.nome} <SeloDaTemporada encerrada={temporada.encerrada} />
         </h2>
         <div className="flex flex-wrap gap-2">
@@ -320,7 +320,7 @@ function ConfiguracaoDoCampeonato({ campeonato }: { campeonato: Campeonato }) {
   };
   return (
     <section aria-labelledby="configuracao" className="space-y-4 rounded-md border border-border bg-card p-4">
-      <h2 id="configuracao" className="text-lg font-semibold">
+      <h2 id="configuracao" className="font-display text-lg font-bold uppercase tracking-tight text-foreground">
         Regras do Campeonato
       </h2>
       {campeonato.congelado ? (
@@ -369,7 +369,7 @@ function TimesDoCampeonato({ campeonato }: { campeonato: Campeonato }) {
 
   return (
     <section aria-labelledby="times-do-campeonato" className="space-y-3 rounded-md border border-border bg-card p-4">
-      <h2 id="times-do-campeonato" className="text-lg font-semibold">
+      <h2 id="times-do-campeonato" className="font-display text-lg font-bold uppercase tracking-tight text-foreground">
         Times do Campeonato
       </h2>
       <ErroDaOperacao
@@ -458,7 +458,7 @@ function DetalheDoCampeonato({ campeonato }: { campeonato: Campeonato }) {
         }
       />
       <section aria-labelledby="dados" className="space-y-4 rounded-md border border-border bg-card p-4">
-        <h2 id="dados" className="text-lg font-semibold">
+        <h2 id="dados" className="font-display text-lg font-bold uppercase tracking-tight text-foreground">
           Dados
         </h2>
         <ErroDaOperacao erro={salvar.error} />
@@ -494,7 +494,7 @@ function DetalheDoCampeonato({ campeonato }: { campeonato: Campeonato }) {
       <ConfiguracaoDoCampeonato campeonato={campeonato} />
       <TimesDoCampeonato campeonato={campeonato} />
       <section aria-labelledby="atalhos" className="space-y-2 rounded-md border border-border bg-card p-4">
-        <h2 id="atalhos" className="text-lg font-semibold">
+        <h2 id="atalhos" className="font-display text-lg font-bold uppercase tracking-tight text-foreground">
           Partidas e classificação
         </h2>
         <p className="text-sm text-muted-foreground">Agende e lance resultados em Partidas; veja a tabela e decida empates em Fases.</p>

@@ -113,7 +113,7 @@ function PainelDaFase({ faseId }: { faseId: string }) {
         }}
       </EstadoDaConsulta>
       <div className="space-y-2 rounded-md border border-border bg-card p-4">
-        <h2 className="font-semibold">Recalcular a classificação</h2>
+        <h2 className="font-display text-lg font-bold uppercase tracking-tight text-foreground">Recalcular a classificação</h2>
         <p className="text-sm text-muted-foreground">
           Refaz a tabela do zero a partir das Partidas finalizadas e compara com a consulta normal. Qualquer diferença indica defeito, e não rotina.
         </p>

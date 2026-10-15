@@ -3,7 +3,6 @@ import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { Alerta } from "@/components/Alerta";
 import { CabecalhoDePagina } from "@/components/CabecalhoDePagina";
 import { PularParaConteudo } from "@/components/layout/PularParaConteudo";
-import { TemaToggle } from "@/components/layout/TemaToggle";
 import { Marca } from "@/components/layout/Marca";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,14 +40,13 @@ export default function Entrar() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background to-secondary p-4 text-foreground">
       <PularParaConteudo />
-      <header className="container flex h-14 items-center justify-between">
-        <Marca />
-        <TemaToggle />
-      </header>
-      <main id="conteudo" tabIndex={-1} className="container max-w-formulario py-8 focus:outline-none">
-        <CabecalhoDePagina titulo="Entrar na administração" descricao="Acesso restrito aos Administradores." />
+      <main id="conteudo" tabIndex={-1} className="esports-card w-full max-w-md space-y-4 p-6 focus:outline-none">
+        <div className="flex flex-col items-center gap-2 text-center">
+          <Marca />
+          <CabecalhoDePagina titulo="Entrar" descricao="Painel Admin: acesso restrito aos Administradores." />
+        </div>
         {sessaoExpirou ? (
           <Alerta variante="info" titulo="Sua sessão expirou." className="mb-4">
             Entre de novo para continuar.

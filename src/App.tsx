@@ -32,7 +32,7 @@ const clienteDeConsultas = new QueryClient({
 
 const App = () => (
   <QueryClientProvider client={clienteDeConsultas}>
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem storageKey="rks-tema">
+    <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark">
       <AuthProvider>
         <TooltipProvider>
           <Toaster position="bottom-center" />

@@ -35,12 +35,14 @@ export function ListaDeJogadores() {
             <ul className="grid gap-2 sm:grid-cols-2">
               {resposta.dados.itens.map((j) => (
                 <li key={j.id}>
-                  <Link to={`/jogadores/${j.id}`} className="flex min-h-14 items-center gap-3 rounded-md border border-border bg-card p-3 hover:bg-accent">
-                    <Avatar src={j.fotoUrl} texto={iniciais(j.nick)} tamanho={40} />
-                    <span className="font-medium">
-                      {j.nick}
-                      <span className="text-muted-foreground">#{j.tag}</span>
-                    </span>
+                  <Link to={`/jogadores/${j.id}`} className="block">
+                    <div className="esports-card flex items-center gap-3 p-5 transition-all hover:scale-[1.02]">
+                      <Avatar src={j.fotoUrl} texto={iniciais(j.nick)} tamanho={40} />
+                      <span className="min-w-0">
+                        <span className="block truncate font-display text-base font-bold tracking-tight text-foreground">{j.nick}</span>
+                        <span className="tag-badge">{j.tag}</span>
+                      </span>
+                    </div>
                   </Link>
                 </li>
               ))}
@@ -69,7 +71,7 @@ export function DetalheDoJogador() {
             <CabecalhoDePagina titulo={dados.riotId} descricao="Riot ID" />
           </div>
           <section aria-labelledby="partidas-do-jogador">
-            <h2 id="partidas-do-jogador" className="mb-3 text-xl font-semibold">
+            <h2 id="partidas-do-jogador" className="mb-4 font-display text-2xl font-bold uppercase tracking-tighter text-foreground">
               Desempenho
             </h2>
             <Vazio titulo="Sem Partidas registradas." texto="As estatísticas aparecem quando o Administrador as registrar." />

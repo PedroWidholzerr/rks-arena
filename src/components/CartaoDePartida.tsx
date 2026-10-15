@@ -1,29 +1,39 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { ExternalLink } from "lucide-react";
+import { Calendar, ExternalLink } from "lucide-react";
 import { Avatar } from "@/components/Avatar";
 import { SeloDaPartida } from "@/components/SeloEstado";
 import { Button } from "@/components/ui/button";
-import { diaEHora, ehHttps, placar, textoDoAvatarDoTime } from "@/lib/formato";
+import { diaEHora, ehHttps, textoDoAvatarDoTime } from "@/lib/formato";
 import { cn } from "@/lib/utils";
 import type { Partida, TimeResumo } from "@/types";
 
-function LinhaDoTime({ time, jogos, vencedor }: { time: TimeResumo | null; jogos: number | null; vencedor: boolean }) {
-  return (
-    <div className={cn("relative flex min-h-12 items-center gap-3 pl-3", vencedor && "font-bold")}>
-      {vencedor ? <span aria-hidden="true" className="absolute inset-y-1 left-0 w-[3px] rounded-full bg-primary" /> : null}
-      {time ? (
-        <>
-          <Avatar src={time.logoUrl} texto={textoDoAvatarDoTime(time.tag)} tamanho={32} />
-          <Link to={`/times/${time.id}`} className="min-w-0 flex-1 truncate">
-            <span className="font-semibold">{time.tag}</span> <span className="font-normal text-muted-foreground">{time.nome}</span>
-          </Link>
-        </>
-      ) : (
-        <span className="flex-1 text-muted-foreground">A definir</span>
-      )}
-      <span className={cn("numero w-8 text-right text-2xl font-bold leading-none", jogos === null && "text-muted-foreground")}>{jogos === null ? "–" : jogos}</span>
+function Lado({ time, direita }: { time: TimeResumo | null; direita?: boolean }) {
+  const identificacao = (
+    <div className={cn("min-w-0", direita && "text-right")}>
+      <p className="truncate font-display text-sm font-bold tracking-tight text-foreground">{time?.nome ?? "A definir"}</p>
+      <span className="font-mono text-xs text-muted-foreground">{time?.tag ?? "—"}</span>
     </div>
+  );
+  const logo = <Avatar src={time?.logoUrl} texto={textoDoAvatarDoTime(time?.tag ?? "?")} tamanho={32} />;
+  const conteudo = direita ? (
+    <>
+      {identificacao}
+      {logo}
+    </>
+  ) : (
+    <>
+      {logo}
+      {identificacao}
+    </>
+  );
+  const classe = cn("flex min-w-0 flex-1 items-center gap-3", direita && "justify-end");
+  return time ? (
+    <Link to={`/times/${time.id}`} className={classe}>
+      {conteudo}
+    </Link>
+  ) : (
+    <div className={classe}>{conteudo}</div>
   );
 }
 
@@ -36,8 +46,8 @@ interface Props {
 }
 
 /**
- * Cartão de Partida do DESIGN.md: duas linhas (uma por Time), placar à direita, vencedor com barra dourada e negrito.
- * Cada estado tem texto, não só cor. "Assistir" só aparece com URL https e abre em nova aba.
+ * Cartão de Partida no estilo do site: Time A, placar em mono no centro, Time B. Vencedor em ciano e perdedor em
+ * vermelho suave, com o texto "W.O." e o estado sempre escritos. "Assistir" só aparece com URL https e abre em nova aba.
  */
 export function CartaoDePartida({ partida, campeonato, acoes }: Props) {
   const finalizada = partida.estado === "FINALIZADA";
@@ -46,27 +56,43 @@ export function CartaoDePartida({ partida, campeonato, acoes }: Props) {
   const aoVivo = partida.estado === "EM_ANDAMENTO" && ehHttps(partida.streamUrl);
   const nomeA = partida.timeA?.nome ?? "a definir";
   const nomeB = partida.timeB?.nome ?? "a definir";
+  const classeDoPlacar = (venceu: boolean, perdeu: boolean) =>
+    cn("numero font-mono text-2xl font-bold", venceu ? "win-text" : perdeu ? "loss-text" : "text-muted-foreground");
 
   return (
-    <article className="rounded-md border border-border bg-card p-4" aria-label={`${nomeA} contra ${nomeB}`}>
-      <header className="mb-2 flex flex-wrap items-center justify-between gap-2 text-xs font-medium text-muted-foreground">
-        <span>
-          {campeonato ? `${campeonato} · ` : ""}Rodada {partida.rodada}
-          {partida.agendadaPara ? <span className="numero"> · {diaEHora(partida.agendadaPara)}</span> : " · Sem horário"}
-        </span>
-        <SeloDaPartida estado={partida.estado} aoVivo={aoVivo} />
-      </header>
-      <div className="divide-y divide-border">
-        <LinhaDoTime time={partida.timeA} jogos={partida.jogosA} vencedor={aVenceu} />
-        <LinhaDoTime time={partida.timeB} jogos={partida.jogosB} vencedor={bVenceu} />
+    <article className="esports-card p-4" aria-label={`${nomeA} contra ${nomeB}`}>
+      <div className="flex items-center justify-between gap-2">
+        <Lado time={partida.timeA} />
+        <div className="flex items-center gap-3 px-2 sm:px-4">
+          <span className={classeDoPlacar(aVenceu, bVenceu)}>
+            <span className="sr-only">{nomeA}: </span>
+            {partida.jogosA ?? "–"}
+          </span>
+          <span className="font-mono text-sm text-muted-foreground" aria-hidden="true">
+            vs
+          </span>
+          <span className={classeDoPlacar(bVenceu, aVenceu)}>
+            <span className="sr-only">{nomeB}: </span>
+            {partida.jogosB ?? "–"}
+          </span>
+        </div>
+        <Lado time={partida.timeB} direita />
       </div>
-      {finalizada ? (
-        <p className="mt-2 text-xs font-medium text-muted-foreground">
-          <span className="sr-only">Placar em Jogos: </span>
-          <span className="numero">{placar(partida.jogosA, partida.jogosB)}</span>
-          {partida.walkover ? " · W.O." : ""}
-        </p>
-      ) : null}
+
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-border pt-3">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1">
+            <Calendar aria-hidden="true" className="h-3 w-3" />
+            <span className="numero font-mono">{partida.agendadaPara ? diaEHora(partida.agendadaPara) : "Sem horário"}</span>
+          </span>
+          <span className="font-mono">
+            {campeonato ? `${campeonato} · ` : ""}Rodada <span className="numero">{partida.rodada}</span>
+          </span>
+          {partida.walkover ? <span className="font-mono uppercase">W.O.</span> : null}
+        </div>
+        <SeloDaPartida estado={partida.estado} aoVivo={aoVivo} />
+      </div>
+
       {ehHttps(partida.streamUrl) || acoes ? (
         <div className="mt-3 flex flex-wrap items-center gap-2">
           {ehHttps(partida.streamUrl) ? (

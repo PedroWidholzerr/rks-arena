@@ -182,7 +182,7 @@ export function PainelDeResultado({ partida, melhorDe, temporadaId, nomeDoCampeo
                     <Label
                       key={chaveDoPlacar(a, b)}
                       htmlFor={`placar-${a}-${b}`}
-                      className="flex min-h-12 cursor-pointer items-center gap-3 rounded-md border border-border-strong bg-card px-3 text-lg font-semibold"
+                      className="flex min-h-12 cursor-pointer items-center gap-3 rounded-md border border-border-strong bg-card px-3 font-display text-lg font-bold uppercase tracking-tight text-foreground"
                     >
                       <RadioGroupItem id={`placar-${a}-${b}`} value={chaveDoPlacar(a, b)} aria-label={`${nomeA} ${a}, ${nomeB} ${b}`} />
                       <span className="numero">

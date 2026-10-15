@@ -18,13 +18,16 @@ interface Props {
   densa?: boolean;
 }
 
+const CABECALHO = "px-3 py-3 font-mono text-xs uppercase tracking-widest text-muted-foreground";
+
 /**
- * Classificação exatamente como a API devolve: a interface nunca calcula nem reordena (sem ordenar por cabeçalho).
- * Cabeçalhos curtos com nome completo para leitor de tela. Times empatados dividem a posição e levam o selo "Empate".
+ * Classificação no estilo do site, exatamente como a API devolve: a interface nunca calcula nem reordena (sem ordenar
+ * por cabeçalho). Cabeçalhos curtos com nome completo para leitor de tela. Times empatados dividem a posição e levam o
+ * selo "Empate". Vitórias em ciano e derrotas em vermelho suave, sempre como números escritos.
  */
 export function TabelaClassificacao({ linhas, empatesAbertos, foco, aoDecidir, densa = false }: Props) {
   const [abertas, setAbertas] = useState<Set<string>>(new Set());
-  const altura = densa ? "h-9" : "h-12";
+  const altura = densa ? "h-10" : "h-12";
   const nomes = new Map(linhas.map((l) => [l.timeId, l.nome]));
 
   const alternar = (id: string) =>
@@ -36,7 +39,7 @@ export function TabelaClassificacao({ linhas, empatesAbertos, foco, aoDecidir, d
     });
 
   const cabecalho = (sigla: string, nome: string, extra?: string) => (
-    <th scope="col" className={cn("px-2 text-right font-medium", extra)}>
+    <th scope="col" className={cn(CABECALHO, "text-center font-medium", extra)}>
       <abbr title={nome} className="no-underline">
         {sigla}
       </abbr>
@@ -46,16 +49,16 @@ export function TabelaClassificacao({ linhas, empatesAbertos, foco, aoDecidir, d
 
   return (
     <div className="space-y-3">
-      <div className="overflow-x-auto rounded-md border border-border bg-card">
+      <div className="esports-card overflow-x-auto">
         <table className="w-full border-collapse text-sm">
           <caption className="sr-only">Classificação</caption>
-          <thead className="bg-surface-muted text-muted-foreground">
-            <tr className="h-10 text-sm">
-              <th scope="col" className="w-10 px-2 text-center font-medium">
+          <thead>
+            <tr className="border-b border-border bg-background">
+              <th scope="col" className={cn(CABECALHO, "w-10 text-left")}>
                 <span className="sr-only">Posição</span>
                 <span aria-hidden="true">#</span>
               </th>
-              <th scope="col" className="px-2 text-left font-medium">
+              <th scope="col" className={cn(CABECALHO, "text-left")}>
                 Time
               </th>
               {cabecalho("J", "Jogadas")}
@@ -66,7 +69,7 @@ export function TabelaClassificacao({ linhas, empatesAbertos, foco, aoDecidir, d
               {cabecalho("SJ", "Saldo de Jogos")}
               {cabecalho("Pts", "Pontos")}
               {aoDecidir ? (
-                <th scope="col" className="px-2 text-right font-medium">
+                <th scope="col" className={cn(CABECALHO, "text-right")}>
                   Ações
                 </th>
               ) : null}
@@ -79,30 +82,32 @@ export function TabelaClassificacao({ linhas, empatesAbertos, foco, aoDecidir, d
               const empate = empatesAbertos.find((e) => e.times.includes(linha.timeId));
               return (
                 <Fragment key={linha.timeId}>
-                  <tr className={cn("border-t border-border", altura, emFoco && "bg-accent-soft font-semibold")}>
-                    <td className="numero px-2 text-center font-medium">
+                  <tr className={cn("border-b border-border transition-colors hover:bg-[hsl(0_0%_100%/0.03)]", altura, emFoco && "bg-primary/10")}>
+                    <td className="numero px-3 py-2 font-mono text-sm text-muted-foreground">
                       {linha.posicao}º
                       {linha.empate ? <span className="sr-only"> (empatadas, aguardando decisão)</span> : null}
                     </td>
-                    <td className="px-2">
-                      <Link to={`/times/${linha.timeId}`} className="flex min-h-toque items-center gap-2 lg:min-h-0">
-                        <Avatar src={linha.logoUrl} texto={textoDoAvatarDoTime(linha.tag)} tamanho={28} />
-                        <span className="font-semibold">{linha.tag}</span>
-                        <span className="hidden max-w-[10rem] truncate font-normal text-muted-foreground sm:inline">{linha.nome}</span>
+                    <td className="px-3 py-2">
+                      <Link to={`/times/${linha.timeId}`} className="flex min-h-toque items-center gap-3 lg:min-h-0">
+                        <Avatar src={linha.logoUrl} texto={textoDoAvatarDoTime(linha.tag)} tamanho={32} />
+                        <span className="min-w-0">
+                          <span className="font-display text-sm font-semibold text-foreground">{linha.nome}</span>
+                          <span className="ml-2 font-mono text-xs text-muted-foreground">{linha.tag}</span>
+                        </span>
                         {linha.empate ? <Selo tom="info">Empate</Selo> : null}
                       </Link>
                     </td>
-                    <td className="numero px-2 text-right">{linha.jogadas}</td>
-                    <td className="numero px-2 text-right">{linha.vitorias}</td>
-                    <td className="numero px-2 text-right">{linha.derrotas}</td>
-                    <td className="numero hidden px-2 text-right md:table-cell">{linha.jogosAFavor}</td>
-                    <td className="numero hidden px-2 text-right md:table-cell">{linha.jogosContra}</td>
-                    <td className="numero px-2 text-right">{linha.saldo > 0 ? `+${linha.saldo}` : linha.saldo}</td>
-                    <td className="numero px-2 text-right font-bold">{linha.pontos}</td>
+                    <td className="numero px-3 py-2 text-center font-mono text-sm">{linha.jogadas}</td>
+                    <td className="numero win-text px-3 py-2 text-center font-mono text-sm">{linha.vitorias}</td>
+                    <td className="numero loss-text px-3 py-2 text-center font-mono text-sm">{linha.derrotas}</td>
+                    <td className="numero hidden px-3 py-2 text-center font-mono text-sm md:table-cell">{linha.jogosAFavor}</td>
+                    <td className="numero hidden px-3 py-2 text-center font-mono text-sm md:table-cell">{linha.jogosContra}</td>
+                    <td className="numero px-3 py-2 text-center font-mono text-sm">{linha.saldo > 0 ? `+${linha.saldo}` : linha.saldo}</td>
+                    <td className="numero px-3 py-2 text-center font-mono text-sm font-bold text-foreground">{linha.pontos}</td>
                     {aoDecidir ? (
-                      <td className="px-2 text-right">
+                      <td className="px-3 py-2 text-right">
                         {empate ? (
-                          <button type="button" className="min-h-toque text-sm text-accent-text underline underline-offset-2 lg:min-h-0" onClick={() => aoDecidir(empate)}>
+                          <button type="button" className="min-h-toque font-mono text-xs uppercase tracking-wider text-primary underline underline-offset-2 lg:min-h-0" onClick={() => aoDecidir(empate)}>
                             Decidir
                           </button>
                         ) : null}
@@ -115,13 +120,13 @@ export function TabelaClassificacao({ linhas, empatesAbertos, foco, aoDecidir, d
                         type="button"
                         aria-expanded={aberta}
                         onClick={() => alternar(linha.timeId)}
-                        className="flex min-h-toque w-full items-center gap-1 px-3 text-xs text-accent-text underline underline-offset-2"
+                        className="flex min-h-toque w-full items-center gap-1 px-3 font-mono text-xs uppercase tracking-wider text-primary"
                       >
                         {aberta ? <ChevronUp aria-hidden="true" className="h-3 w-3" /> : <ChevronDown aria-hidden="true" className="h-3 w-3" />}
                         {aberta ? "Ocultar detalhes" : "Ver detalhes"} de {linha.tag}
                       </button>
                       {aberta ? (
-                        <p className="numero px-3 pb-3 text-sm text-muted-foreground">
+                        <p className="numero px-3 pb-3 font-mono text-xs text-muted-foreground">
                           Jogos a favor: {linha.jogosAFavor} · Jogos contra: {linha.jogosContra}
                         </p>
                       ) : null}

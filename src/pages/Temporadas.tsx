@@ -30,9 +30,9 @@ export function ListaDeTemporadas() {
         {(resposta) => (
           <ul className="space-y-3">
             {resposta.dados.map(({ temporada, campeonatos, destaque }) => (
-              <li key={temporada.id} className="rounded-md border border-border bg-card p-4">
+              <li key={temporada.id} className="esports-card p-5">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <h2 className="font-semibold">
+                  <h2 className="font-display text-lg font-bold tracking-tight text-foreground">
                     <Link to={`/temporadas/${temporada.id}`} className="underline underline-offset-2">
                       {temporada.nome}
                     </Link>

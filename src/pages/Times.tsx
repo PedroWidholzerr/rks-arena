@@ -37,15 +37,17 @@ export function ListaDeTimes() {
               {times.length === 0 ? (
                 <Vazio titulo="Nenhum Time encontrado." />
               ) : (
-                <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {times.map((t) => (
                     <li key={t.id}>
-                      <Link to={`/times/${t.id}`} className="flex min-h-14 items-center gap-3 rounded-md border border-border bg-card p-3 hover:bg-accent">
-                        <Avatar src={t.logoUrl} texto={textoDoAvatarDoTime(t.tag)} tamanho={40} />
-                        <span className="min-w-0">
-                          <span className="block font-semibold">{t.tag}</span>
-                          <span className="block truncate text-sm text-muted-foreground">{t.nome}</span>
-                        </span>
+                      <Link to={`/times/${t.id}`} className="block h-full">
+                        <div className="esports-card flex h-full items-center gap-4 p-5 transition-all hover:scale-[1.02]">
+                          <Avatar src={t.logoUrl} texto={textoDoAvatarDoTime(t.tag)} tamanho={40} />
+                          <span className="min-w-0">
+                            <span className="block truncate font-display text-lg font-bold tracking-tight text-foreground">{t.nome}</span>
+                            <span className="tag-badge">{t.tag}</span>
+                          </span>
+                        </div>
                       </Link>
                     </li>
                   ))}
@@ -94,7 +96,7 @@ export function DetalheDoTime() {
             <CabecalhoDePagina titulo={`${dados.time.tag} · ${dados.time.nome}`} />
           </div>
           <section aria-labelledby="elenco" className="mb-8">
-            <h2 id="elenco" className="mb-3 text-xl font-semibold">
+            <h2 id="elenco" className="mb-4 font-display text-2xl font-bold uppercase tracking-tighter text-foreground">
               Elenco
             </h2>
             {dados.elencos.length === 0 ? (
@@ -103,7 +105,7 @@ export function DetalheDoTime() {
               <div className="space-y-4">
                 {dados.elencos.map((elenco) => (
                   <div key={elenco.id} className="rounded-md border border-border bg-card p-4">
-                    <h3 className="mb-2 font-semibold">{nomeDaTemporada.get(elenco.temporadaId) ?? "Temporada"}</h3>
+                    <h3 className="mb-3 font-display text-lg font-bold uppercase tracking-tight text-foreground">{nomeDaTemporada.get(elenco.temporadaId) ?? "Temporada"}</h3>
                     <ul className="divide-y divide-border">
                       {elenco.membros.map((m) => (
                         <li key={m.jogadorId} className="flex min-h-12 items-center gap-3">
@@ -129,7 +131,7 @@ export function DetalheDoTime() {
             )}
           </section>
           <section aria-labelledby="historico">
-            <h2 id="historico" className="mb-3 text-xl font-semibold">
+            <h2 id="historico" className="mb-4 font-display text-2xl font-bold uppercase tracking-tighter text-foreground">
               Partidas
             </h2>
             <HistoricoDoTime timeId={id} />

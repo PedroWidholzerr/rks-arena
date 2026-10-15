@@ -1,13 +1,9 @@
-import { useState } from "react";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
-import { Bell, CalendarDays, ClipboardList, Layers, LogOut, Menu, Shield, Trophy, UserRound, Users, type LucideIcon } from "lucide-react";
+import { ArrowLeft, Bell, CalendarDays, ClipboardList, Layers, LogOut, Shield, Trophy, UserRound, Users, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
-import { Marca } from "./Marca";
 import { PularParaConteudo } from "./PularParaConteudo";
-import { TemaToggle } from "./TemaToggle";
 
 interface Area {
   para: string;
@@ -28,34 +24,10 @@ export const AREAS_DO_ADMIN: Area[] = [
   { para: "/admin/administradores", rotulo: "Administradores", Icone: Shield },
 ];
 
-function Navegacao({ aoNavegar }: { aoNavegar?: () => void }) {
-  return (
-    <nav aria-label="Áreas do painel" className="flex flex-col gap-1">
-      {AREAS_DO_ADMIN.map(({ para, rotulo, Icone, fim }) => (
-        <NavLink
-          key={para}
-          to={para}
-          end={fim}
-          onClick={aoNavegar}
-          className={({ isActive }) =>
-            cn(
-              "flex min-h-toque items-center gap-3 border-l-4 px-3 text-sm lg:min-h-9",
-              isActive ? "border-primary bg-card font-semibold text-foreground" : "border-transparent text-muted-foreground hover:bg-card hover:text-foreground",
-            )
-          }
-        >
-          <Icone aria-hidden="true" className="h-4 w-4" />
-          {rotulo}
-        </NavLink>
-      ))}
-    </nav>
-  );
-}
-
+/** Painel admin: barra lateral de 224 px no desktop e faixa rolável no celular, em mono maiúsculo. */
 export default function LayoutAdmin() {
   const { email, sair } = useAuth();
   const navegar = useNavigate();
-  const [gaveta, setGaveta] = useState(false);
 
   const aoSair = () => {
     sair();
@@ -63,48 +35,72 @@ export default function LayoutAdmin() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground lg:grid lg:grid-cols-[240px_1fr]">
+    <div className="flex min-h-screen bg-background text-foreground">
       <PularParaConteudo />
-      <aside className="hidden border-r border-sidebar-border bg-sidebar lg:block">
-        <div className="sticky top-0 flex h-screen flex-col gap-4 p-4">
-          <Marca />
-          <p className="px-3 text-xs font-medium text-muted-foreground">Painel do Administrador</p>
-          <Navegacao />
-        </div>
+      <aside className="hidden w-56 shrink-0 border-r border-border bg-surface p-4 md:block">
+        <Link to="/" className="mb-6 flex items-center gap-1 font-mono text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground">
+          <ArrowLeft aria-hidden="true" className="h-3 w-3" /> Voltar ao site
+        </Link>
+        <p className="mb-4 font-mono text-xs uppercase tracking-widest text-muted-foreground">Painel Admin</p>
+        <nav aria-label="Áreas do painel" className="flex flex-col gap-1">
+          {AREAS_DO_ADMIN.map(({ para, rotulo, Icone, fim }) => (
+            <NavLink
+              key={para}
+              to={para}
+              end={fim}
+              className={({ isActive }) =>
+                cn(
+                  "flex items-center gap-2 rounded-md px-3 py-2 font-mono text-xs uppercase tracking-wider transition-colors",
+                  isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+                )
+              }
+            >
+              <Icone aria-hidden="true" className="h-4 w-4" />
+              {rotulo}
+            </NavLink>
+          ))}
+        </nav>
       </aside>
-      <div className="flex min-w-0 flex-col">
-        <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-2 border-b border-border bg-background px-4">
-          <div className="flex items-center gap-2 lg:hidden">
-            <Sheet open={gaveta} onOpenChange={setGaveta}>
-              <SheetTrigger asChild>
-                <Button variant="secondary" className="min-h-toque" aria-label="Abrir menu">
-                  <Menu aria-hidden="true" className="mr-2 h-4 w-4" />
-                  Menu
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-72 bg-sidebar shadow-flutuante">
-                <SheetHeader>
-                  <SheetTitle>Painel do Administrador</SheetTitle>
-                </SheetHeader>
-                <div className="mt-4">
-                  <Navegacao aoNavegar={() => setGaveta(false)} />
-                </div>
-              </SheetContent>
-            </Sheet>
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-xl">
+          <div className="flex h-14 items-center justify-between gap-2 px-4 md:px-8">
+            <Link to="/" className="flex items-center gap-1 font-mono text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground md:hidden">
+              <ArrowLeft aria-hidden="true" className="h-3 w-3" /> Site
+            </Link>
+            <div className="ml-auto flex items-center gap-1">
+              {email ? <span className="hidden max-w-[16rem] truncate font-mono text-xs text-muted-foreground sm:inline">{email}</span> : null}
+              <Button asChild variant="ghost" className="min-h-toque font-mono text-xs uppercase tracking-wider">
+                <Link to="/troque-sua-senha">Trocar senha</Link>
+              </Button>
+              <Button variant="ghost" className="min-h-toque font-mono text-xs uppercase tracking-wider" onClick={aoSair}>
+                <LogOut aria-hidden="true" className="mr-2 h-4 w-4" />
+                Sair
+              </Button>
+            </div>
           </div>
-          <div className="ml-auto flex items-center gap-1">
-            {email ? <span className="hidden max-w-[16rem] truncate text-sm text-muted-foreground sm:inline">{email}</span> : null}
-            <TemaToggle />
-            <Button asChild variant="ghost" className="min-h-toque">
-              <Link to="/troque-sua-senha">Trocar senha</Link>
-            </Button>
-            <Button variant="ghost" className="min-h-toque" onClick={aoSair}>
-              <LogOut aria-hidden="true" className="mr-2 h-4 w-4" />
-              Sair
-            </Button>
-          </div>
+          <nav aria-label="Áreas do painel" className="overflow-x-auto border-t border-border bg-surface p-2 md:hidden">
+            <div className="flex gap-1">
+              {AREAS_DO_ADMIN.map(({ para, rotulo, Icone, fim }) => (
+                <NavLink
+                  key={para}
+                  to={para}
+                  end={fim}
+                  className={({ isActive }) =>
+                    cn(
+                      "flex min-h-toque items-center gap-1 whitespace-nowrap rounded-md px-3 font-mono text-xs uppercase tracking-wider",
+                      isActive ? "bg-primary/10 text-primary" : "text-muted-foreground",
+                    )
+                  }
+                >
+                  <Icone aria-hidden="true" className="h-3 w-3" />
+                  {rotulo}
+                </NavLink>
+              ))}
+            </div>
+          </nav>
         </header>
-        <main id="conteudo" tabIndex={-1} className="flex-1 p-4 focus:outline-none sm:p-6">
+        <main id="conteudo" tabIndex={-1} className="flex-1 p-4 focus:outline-none md:p-8">
           <Outlet />
         </main>
       </div>
