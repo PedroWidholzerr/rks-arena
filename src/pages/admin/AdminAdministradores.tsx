@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { adminChaves, mensagemDeErro, useAdminAdministradores, useMutacao } from "@/hooks/dados";
+import { useAuth } from "@/contexts/AuthContext";
 import { adminApi } from "@/services/api";
 import type { Administrador } from "@/types";
 
@@ -20,8 +21,9 @@ const LIMITE = 3;
 
 function DialogoDeNovoAdministrador({ aoFechar }: { aoFechar: () => void }) {
   const [email, setEmail] = useState("");
+  const [nome, setNome] = useState("");
   const [temporaria, setTemporaria] = useState<{ email: string; senha: string } | null>(null);
-  const criar = useMutacao(() => adminApi.criarAdministrador(email), {
+  const criar = useMutacao(() => adminApi.criarAdministrador(email, nome.trim()), {
     invalidar: [adminChaves.administradores],
     aoConcluir: (r) => setTemporaria({ email: r.administrador.email, senha: r.senhaTemporaria }),
   });
@@ -66,6 +68,11 @@ function DialogoDeNovoAdministrador({ aoFechar }: { aoFechar: () => void }) {
           <form onSubmit={enviar} className="space-y-4" aria-busy={criar.isPending}>
             <ErroDaOperacao erro={criar.error} />
             <div className="flex flex-col gap-1.5">
+              <Label htmlFor="novo-admin-nome">Nome</Label>
+              <Input id="novo-admin-nome" maxLength={120} className="min-h-11 text-base" value={nome} onChange={(e) => setNome(e.target.value)} />
+              <p className="text-sm text-muted-foreground">Como o painel vai chamar a pessoa. Opcional: sem nome, aparece o e-mail.</p>
+            </div>
+            <div className="flex flex-col gap-1.5">
               <Label htmlFor="novo-admin-email">E-mail (obrigatório)</Label>
               <Input id="novo-admin-email" type="email" required className="min-h-11 text-base" value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
@@ -81,6 +88,41 @@ function DialogoDeNovoAdministrador({ aoFechar }: { aoFechar: () => void }) {
         )}
       </DialogContent>
     </Dialog>
+  );
+}
+
+/** Cada administrador define como o painel o chama. */
+function MeuPerfil() {
+  const { nome, email, definirNome } = useAuth();
+  const [texto, setTexto] = useState(nome ?? "");
+  const salvar = useMutacao(() => adminApi.definirMeuNome(texto), {
+    invalidar: [adminChaves.administradores],
+    sucesso: "Nome salvo.",
+    aoConcluir: (r) => definirNome(r.nome),
+  });
+  return (
+    <section id="perfil" aria-labelledby="meu-perfil" className="space-y-3 rounded-md border border-border bg-card p-4">
+      <h2 id="meu-perfil" className="font-display text-lg font-bold uppercase tracking-tight text-foreground">
+        Meu nome
+      </h2>
+      <p className="text-sm text-muted-foreground">É assim que o painel chama você. Sem nome, aparece o e-mail ({email}).</p>
+      <ErroDaOperacao erro={salvar.error} />
+      <form
+        className="flex flex-wrap items-end gap-3"
+        onSubmit={(e) => {
+          e.preventDefault();
+          salvar.mutate(undefined);
+        }}
+      >
+        <div className="flex min-w-[14rem] flex-1 flex-col gap-1.5">
+          <Label htmlFor="meu-nome">Nome</Label>
+          <Input id="meu-nome" maxLength={120} className="min-h-11 text-base" value={texto} onChange={(e) => setTexto(e.target.value)} />
+        </div>
+        <Button type="submit" className="min-h-toque" disabled={salvar.isPending}>
+          {salvar.isPending ? "Salvando…" : "Salvar nome"}
+        </Button>
+      </form>
+    </section>
   );
 }
 
@@ -127,7 +169,10 @@ export function AdminAdministradores() {
             <ul className="divide-y divide-border rounded-md border border-border bg-card">
               {lista.map((a) => (
                 <li key={a.id} className="flex flex-wrap items-center gap-3 px-3 py-3">
-                  <span className="min-w-0 flex-1 truncate font-medium">{a.email}</span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-medium">{a.nome || a.email}</span>
+                    {a.nome ? <span className="block truncate font-mono text-xs text-muted-foreground">{a.email}</span> : null}
+                  </span>
                   {a.trocarSenha ? <Selo tom="info">Aguardando troca de senha</Selo> : null}
                   <Selo tom={a.ativo ? "sucesso" : "neutro"}>{a.ativo ? "Ativo" : "Desativado"}</Selo>
                   {a.ativo ? (
@@ -157,6 +202,8 @@ export function AdminAdministradores() {
             {exportar.isPending ? "Gerando…" : "Exportar dados"}
           </Button>
         </section>
+
+        <MeuPerfil />
 
         <section aria-labelledby="senha" className="space-y-2 rounded-md border border-border bg-card p-4">
           <h2 id="senha" className="font-display text-lg font-bold uppercase tracking-tight text-foreground">

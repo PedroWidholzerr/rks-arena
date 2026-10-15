@@ -1,6 +1,8 @@
 import { useQueries } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
+import { Alerta } from "@/components/Alerta";
 import { CabecalhoDePagina } from "@/components/CabecalhoDePagina";
+import { useAuth } from "@/contexts/AuthContext";
 import { Vazio } from "@/components/estados/Estados";
 import { Button } from "@/components/ui/button";
 import { adminChaves, chaves, useTodosOsCampeonatosDoAdmin } from "@/hooks/dados";
@@ -9,6 +11,7 @@ import { adminApi, publico } from "@/services/api";
 
 /** Painel de Pendências: o que fazer primeiro. Cada bloco vazio some; bloco com itens mostra a contagem. */
 export function AdminPendencias() {
+  const { nome, exibicao } = useAuth();
   const { lista, carregando } = useTodosOsCampeonatosDoAdmin();
   const emCurso = lista.filter(({ campeonato }) => campeonato.faseId && campeonato.estado !== "ENCERRADO");
   const partidas = useQueries({
@@ -37,7 +40,12 @@ export function AdminPendencias() {
 
   return (
     <>
-      <CabecalhoDePagina titulo="Pendências" descricao="O que fazer primeiro." />
+      <CabecalhoDePagina titulo="Pendências" descricao={exibicao ? `Olá, ${exibicao}. O que fazer primeiro.` : "O que fazer primeiro."} />
+      {!nome ? (
+        <Alerta variante="info" titulo="Defina seu nome" className="mb-6" acao={<Button asChild variant="secondary" size="sm" className="min-h-toque"><Link to="/admin/administradores#perfil">Definir meu nome</Link></Button>}>
+          Hoje o painel chama você pelo e-mail. Escolha como prefere ser chamado.
+        </Alerta>
+      ) : null}
       {carregandoTudo ? <p className="text-sm text-muted-foreground">Verificando o que está pendente…</p> : null}
       {vazio ? <Vazio titulo="Nada pendente. Tudo em dia." /> : null}
       <div className="space-y-6">

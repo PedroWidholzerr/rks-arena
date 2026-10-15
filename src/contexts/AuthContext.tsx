@@ -4,6 +4,7 @@ import { apiClient } from "@/services/apiClient";
 
 interface SessaoGuardada {
   email: string;
+  nome: string | null;
   trocarSenha: boolean;
 }
 
@@ -11,6 +12,11 @@ interface ContextoDeAutenticacao {
   /** Há token guardado (a sessão pode ter expirado no servidor; o 401 limpa). */
   autenticado: boolean;
   email: string | null;
+  /** Nome de exibição do administrador (ou null: a tela mostra o e-mail). */
+  nome: string | null;
+  /** Quem aparece na tela: o nome, ou o e-mail quando não há nome. */
+  exibicao: string | null;
+  definirNome: (nome: string | null) => void;
   /** Troca obrigatória de senha pendente: antes disso, só a tela de troca abre. */
   trocarSenha: boolean;
   /** A sessão acabou de expirar (401): a tela de login explica. */
@@ -59,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const entrar = useCallback(async (email: string, senha: string) => {
     const resposta = await autenticacao.entrar(email, senha);
     apiClient.definirToken(resposta.token);
-    const nova = { email: email.trim(), trocarSenha: resposta.trocarSenha };
+    const nova = { email: email.trim(), nome: resposta.nome ?? null, trocarSenha: resposta.trocarSenha };
     guardarSessao(nova);
     setSessaoExpirou(false);
     setSessao(nova);
@@ -69,11 +75,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async (senhaAtual: string, novaSenha: string) => {
       const resposta = await autenticacao.trocarSenha(senhaAtual, novaSenha);
       apiClient.definirToken(resposta.token);
-      const nova = { email: sessao?.email ?? "", trocarSenha: resposta.trocarSenha };
+      const nova = { email: sessao?.email ?? "", nome: resposta.nome ?? sessao?.nome ?? null, trocarSenha: resposta.trocarSenha };
       guardarSessao(nova);
       setSessao(nova);
     },
-    [sessao?.email],
+    [sessao?.email, sessao?.nome],
   );
 
   const sair = useCallback(() => {
@@ -87,6 +93,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => ({
       autenticado: sessao !== null,
       email: sessao?.email ?? null,
+      nome: sessao?.nome ?? null,
+      exibicao: sessao ? sessao.nome || sessao.email : null,
+      definirNome: (nome) =>
+        setSessao((atual) => {
+          if (!atual) return atual;
+          const nova = { ...atual, nome: nome && nome.trim() ? nome.trim() : null };
+          guardarSessao(nova);
+          return nova;
+        }),
       trocarSenha: sessao?.trocarSenha ?? false,
       sessaoExpirou,
       entrar,

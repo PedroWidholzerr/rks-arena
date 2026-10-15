@@ -5,7 +5,6 @@ import { Link } from "react-router-dom";
 import { Avatar } from "@/components/Avatar";
 import { CartaoDeCampeonato } from "@/components/CartaoDeCampeonato";
 import { ESPACO } from "@/components/layout/LayoutPublico";
-import { Logo } from "@/components/layout/Marca";
 import { cn } from "@/lib/utils";
 import { CartaoDePartida } from "@/components/CartaoDePartida";
 import { EstadoDaConsulta, Vazio } from "@/components/estados/Estados";
@@ -102,7 +101,7 @@ export default function Inicio() {
     <div>
       <section className="relative overflow-hidden border-b border-border">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
-        <div className={cn(ESPACO, "relative grid items-center gap-8 py-12 md:py-16 lg:grid-cols-[1fr_auto]")}>
+        <div className={cn(ESPACO, "relative py-12 md:py-16")}>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}>
             <div className="mb-4 flex items-center gap-2">
               <Zap aria-hidden="true" className="h-5 w-5 animate-pulse-glow text-accent-text" />
@@ -114,9 +113,6 @@ export default function Inicio() {
             <p className="mt-4 max-w-lg text-lg text-muted-foreground">
               Acompanhe temporadas, campeonatos, classificação, partidas, times e jogadores do Rising Kings.
             </p>
-          </motion.div>
-          <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} className="justify-self-start lg:justify-self-end">
-            <Logo tamanho="h-44 w-44 sm:h-56 sm:w-56 lg:h-72 lg:w-72" className="rounded-2xl shadow-flutuante ring-1 ring-primary/30" />
           </motion.div>
         </div>
       </section>

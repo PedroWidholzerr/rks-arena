@@ -152,6 +152,7 @@ export interface Tabela {
 export interface Administrador {
   id: string;
   email: string;
+  nome: string | null;
   ativo: boolean;
   trocarSenha: boolean;
   criadoEm: string;
@@ -161,6 +162,7 @@ export interface SessaoDoServidor {
   token: string;
   trocarSenha: boolean;
   expiraEm: string;
+  nome: string | null;
 }
 
 /** Envelope das respostas públicas de dados: sempre traz quando o dado foi montado. */

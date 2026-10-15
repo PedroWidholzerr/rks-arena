@@ -135,8 +135,10 @@ export const adminApi = {
   recalcular: (faseId: string) => admin<Recalculo>(`/admin/phases/${faseId}/recalculate`, "POST"),
 
   administradores: () => admin<Administrador[]>("/admin/users"),
-  criarAdministrador: (email: string) =>
-    admin<{ administrador: Administrador; senhaTemporaria: string }>("/admin/users", "POST", { email }),
+  criarAdministrador: (email: string, nome?: string) =>
+    admin<{ administrador: Administrador; senhaTemporaria: string }>("/admin/users", "POST", { email, nome: nome || undefined }),
+  /** Cada administrador define o próprio nome de exibição (vazio volta a mostrar o e-mail). */
+  definirMeuNome: (nome: string) => admin<Administrador>("/admin/users/me", "PATCH", { nome }),
   definirAtivo: (id: string, ativo: boolean) => admin<Administrador>(`/admin/users/${id}/active`, "PATCH", { ativo }),
   exportar: () => admin<Record<string, unknown>>("/admin/export"),
 };

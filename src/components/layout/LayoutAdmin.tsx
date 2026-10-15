@@ -28,7 +28,7 @@ export const AREAS_DO_ADMIN: Area[] = [
 
 /** Painel admin: barra lateral de 224 px no desktop e faixa rolável no celular, em mono maiúsculo. */
 export default function LayoutAdmin() {
-  const { email, sair } = useAuth();
+  const { exibicao, sair } = useAuth();
   const navegar = useNavigate();
 
   const aoSair = () => {
@@ -75,7 +75,7 @@ export default function LayoutAdmin() {
             </Link>
             <div className="ml-auto flex items-center gap-1">
               <TemaToggle />
-              {email ? <span className="hidden max-w-[16rem] truncate font-mono text-xs text-muted-foreground sm:inline">{email}</span> : null}
+              {exibicao ? <span className="hidden max-w-[16rem] truncate font-mono text-xs text-muted-foreground sm:inline">Olá, {exibicao}</span> : null}
               <Button asChild variant="ghost" className="min-h-toque font-mono text-xs uppercase tracking-wider">
                 <Link to="/troque-sua-senha">Trocar senha</Link>
               </Button>
