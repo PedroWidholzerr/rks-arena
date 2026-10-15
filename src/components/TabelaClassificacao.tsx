@@ -82,7 +82,7 @@ export function TabelaClassificacao({ linhas, empatesAbertos, foco, aoDecidir, d
               const empate = empatesAbertos.find((e) => e.times.includes(linha.timeId));
               return (
                 <Fragment key={linha.timeId}>
-                  <tr className={cn("border-b border-border transition-colors hover:bg-[hsl(0_0%_100%/0.03)]", altura, emFoco && "bg-primary/10")}>
+                  <tr className={cn("border-b border-border transition-colors hover:bg-accent/50", altura, emFoco && "bg-primary/10")}>
                     <td className="numero px-3 py-2 font-mono text-sm text-muted-foreground">
                       {linha.posicao}º
                       {linha.empate ? <span className="sr-only"> (empatadas, aguardando decisão)</span> : null}
@@ -107,7 +107,7 @@ export function TabelaClassificacao({ linhas, empatesAbertos, foco, aoDecidir, d
                     {aoDecidir ? (
                       <td className="px-3 py-2 text-right">
                         {empate ? (
-                          <button type="button" className="min-h-toque font-mono text-xs uppercase tracking-wider text-primary underline underline-offset-2 lg:min-h-0" onClick={() => aoDecidir(empate)}>
+                          <button type="button" className="min-h-toque font-mono text-xs uppercase tracking-wider text-accent-text underline underline-offset-2 lg:min-h-0" onClick={() => aoDecidir(empate)}>
                             Decidir
                           </button>
                         ) : null}
@@ -120,7 +120,7 @@ export function TabelaClassificacao({ linhas, empatesAbertos, foco, aoDecidir, d
                         type="button"
                         aria-expanded={aberta}
                         onClick={() => alternar(linha.timeId)}
-                        className="flex min-h-toque w-full items-center gap-1 px-3 font-mono text-xs uppercase tracking-wider text-primary"
+                        className="flex min-h-toque w-full items-center gap-1 px-3 font-mono text-xs uppercase tracking-wider text-accent-text"
                       >
                         {aberta ? <ChevronUp aria-hidden="true" className="h-3 w-3" /> : <ChevronDown aria-hidden="true" className="h-3 w-3" />}
                         {aberta ? "Ocultar detalhes" : "Ver detalhes"} de {linha.tag}

@@ -3,7 +3,9 @@ import { ArrowLeft, Bell, CalendarDays, ClipboardList, Layers, LogOut, Shield, T
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
+import { Marca } from "./Marca";
 import { PularParaConteudo } from "./PularParaConteudo";
+import { TemaToggle } from "./TemaToggle";
 
 interface Area {
   para: string;
@@ -38,6 +40,9 @@ export default function LayoutAdmin() {
     <div className="flex min-h-screen bg-background text-foreground">
       <PularParaConteudo />
       <aside className="hidden w-56 shrink-0 border-r border-border bg-surface p-4 md:block">
+        <div className="mb-5">
+          <Marca />
+        </div>
         <Link to="/" className="mb-6 flex items-center gap-1 font-mono text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground">
           <ArrowLeft aria-hidden="true" className="h-3 w-3" /> Voltar ao site
         </Link>
@@ -51,7 +56,7 @@ export default function LayoutAdmin() {
               className={({ isActive }) =>
                 cn(
                   "flex items-center gap-2 rounded-md px-3 py-2 font-mono text-xs uppercase tracking-wider transition-colors",
-                  isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+                  isActive ? "bg-primary/15 text-accent-text" : "text-muted-foreground hover:bg-secondary hover:text-foreground",
                 )
               }
             >
@@ -69,6 +74,7 @@ export default function LayoutAdmin() {
               <ArrowLeft aria-hidden="true" className="h-3 w-3" /> Site
             </Link>
             <div className="ml-auto flex items-center gap-1">
+              <TemaToggle />
               {email ? <span className="hidden max-w-[16rem] truncate font-mono text-xs text-muted-foreground sm:inline">{email}</span> : null}
               <Button asChild variant="ghost" className="min-h-toque font-mono text-xs uppercase tracking-wider">
                 <Link to="/troque-sua-senha">Trocar senha</Link>
@@ -89,7 +95,7 @@ export default function LayoutAdmin() {
                   className={({ isActive }) =>
                     cn(
                       "flex min-h-toque items-center gap-1 whitespace-nowrap rounded-md px-3 font-mono text-xs uppercase tracking-wider",
-                      isActive ? "bg-primary/10 text-primary" : "text-muted-foreground",
+                      isActive ? "bg-primary/10 text-accent-text" : "text-muted-foreground",
                     )
                   }
                 >

@@ -49,7 +49,7 @@ export function Avatar({ src, texto, tamanho = 32, className }: Props) {
   return (
     <span
       className={cn(
-        "relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-md bg-primary/10 font-mono font-bold text-primary",
+        "relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-md bg-primary/10 font-mono font-bold text-accent-text",
         TAMANHOS[tamanho],
         className,
       )}

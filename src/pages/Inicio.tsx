@@ -4,6 +4,9 @@ import { ArrowRight, Trophy, Users, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Avatar } from "@/components/Avatar";
 import { CartaoDeCampeonato } from "@/components/CartaoDeCampeonato";
+import { ESPACO } from "@/components/layout/LayoutPublico";
+import { Logo } from "@/components/layout/Marca";
+import { cn } from "@/lib/utils";
 import { CartaoDePartida } from "@/components/CartaoDePartida";
 import { EstadoDaConsulta, Vazio } from "@/components/estados/Estados";
 import { SeloDaTemporada } from "@/components/SeloEstado";
@@ -21,7 +24,7 @@ function TituloDeSecao({ id, icone, children, link }: { id: string; icone?: Reac
         {children}
       </h2>
       {link ? (
-        <Link to={link.para} className="flex min-h-toque items-center gap-1 font-mono text-xs uppercase tracking-wider text-primary hover:underline">
+        <Link to={link.para} className="flex min-h-toque items-center gap-1 font-mono text-xs uppercase tracking-wider text-accent-text hover:underline">
           {link.rotulo} <ArrowRight aria-hidden="true" className="h-3 w-3" />
         </Link>
       ) : null}
@@ -72,7 +75,7 @@ function TimesEmDestaque() {
   if (times.length === 0) return null;
   return (
     <section aria-labelledby="times-inicio">
-      <TituloDeSecao id="times-inicio" icone={<Users aria-hidden="true" className="h-6 w-6 text-primary" />} link={{ para: "/times", rotulo: "Ver todos" }}>
+      <TituloDeSecao id="times-inicio" icone={<Users aria-hidden="true" className="h-6 w-6 text-accent-text" />} link={{ para: "/times", rotulo: "Ver todos" }}>
         Times
       </TituloDeSecao>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -96,26 +99,29 @@ export default function Inicio() {
   useTituloDaPagina("Início");
   const consulta = useTemporadasPublicas();
   return (
-    <div className="-mx-4 -my-10 sm:-mx-6 lg:-mx-8">
+    <div>
       <section className="relative overflow-hidden border-b border-border">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
-        <div className="container relative mx-auto px-4 py-16 md:py-20">
+        <div className={cn(ESPACO, "relative grid items-center gap-8 py-12 md:py-16 lg:grid-cols-[1fr_auto]")}>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}>
             <div className="mb-4 flex items-center gap-2">
-              <Zap aria-hidden="true" className="h-5 w-5 animate-pulse-glow text-primary" />
-              <span className="font-mono text-xs uppercase tracking-widest text-primary">Campeonatos de League of Legends</span>
+              <Zap aria-hidden="true" className="h-5 w-5 animate-pulse-glow text-accent-text" />
+              <span className="font-mono text-xs uppercase tracking-widest text-accent-text">Campeonatos de League of Legends</span>
             </div>
             <h1 className="font-display text-5xl font-bold uppercase tracking-tighter text-foreground md:text-7xl">
-              RKS <span className="glow-text text-primary">Arena</span>
+              RKS <span className="glow-text text-accent-text">Arena</span>
             </h1>
             <p className="mt-4 max-w-lg text-lg text-muted-foreground">
               Acompanhe temporadas, campeonatos, classificação, partidas, times e jogadores do Rising Kings.
             </p>
           </motion.div>
+          <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} className="justify-self-start lg:justify-self-end">
+            <Logo tamanho="h-44 w-44 sm:h-56 sm:w-56 lg:h-72 lg:w-72" className="rounded-2xl shadow-flutuante ring-1 ring-primary/30" />
+          </motion.div>
         </div>
       </section>
 
-      <div className="container mx-auto space-y-12 px-4 py-10">
+      <div className={cn(ESPACO, "space-y-12 py-10")}>
         <EstadoDaConsulta
           consulta={consulta}
           rotulo="a página inicial"
@@ -135,7 +141,7 @@ export default function Inicio() {
                 <section aria-labelledby="andamento">
                   <TituloDeSecao
                     id="andamento"
-                    icone={<Trophy aria-hidden="true" className="h-6 w-6 text-primary" />}
+                    icone={<Trophy aria-hidden="true" className="h-6 w-6 text-accent-text" />}
                     link={{ para: `/temporadas/${destaque.temporada.id}`, rotulo: "Ver a Temporada" }}
                   >
                     Campeonatos ativos

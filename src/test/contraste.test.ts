@@ -3,17 +3,17 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
 /**
- * Legibilidade da paleta escura (WCAG AA): lê src/index.css, converte HSL em RGB e mede a razão dos pares de texto e
- * de componentes. Se qualquer par cair abaixo do mínimo, o build falha. Texto normal exige 4,5:1; componentes e anel
- * de foco exigem 3:1.
+ * Legibilidade da paleta do RKS nos DOIS temas (WCAG AA): lê src/index.css, converte HSL em RGB e mede a razão dos
+ * pares de texto e de componentes. Se qualquer par cair abaixo do mínimo, o build falha. Texto normal exige 4,5:1;
+ * anel de foco e contorno de campo exigem 3:1 no tema claro.
  */
 
 const css = readFileSync(resolve(__dirname, "../index.css"), "utf8");
 
-function variaveis(): Record<string, string> {
-  const inicio = css.indexOf(":root {");
-  if (inicio < 0) throw new Error("Bloco :root não encontrado em index.css");
-  const fim = css.indexOf("}", inicio);
+function bloco(seletor: string): Record<string, string> {
+  const inicio = css.indexOf(`${seletor} {`);
+  if (inicio < 0) throw new Error(`Bloco ${seletor} não encontrado em index.css`);
+  const fim = css.indexOf("\n  }", inicio);
   const saida: Record<string, string> = {};
   for (const m of css.slice(inicio, fim).matchAll(/--([a-z0-9-]+):\s*([^;]+);/g)) saida[m[1]] = m[2].trim();
   return saida;
@@ -47,50 +47,67 @@ function razao(a: string, b: string): number {
   return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
 }
 
-const v = variaveis();
-/** Cor das vitórias e derrotas na tabela (as classes .win-text e .loss-text do CSS). */
-const CORES_EXTRAS: Record<string, string> = { "vitoria-texto": v.primary, "derrota-texto": "0 72% 60%" };
-const cor = (nome: string) => CORES_EXTRAS[nome] ?? v[nome];
-
-const PARES: Array<[texto: string, fundo: string, minimo: number]> = [
-  ["foreground", "background", 4.5],
-  ["foreground", "card", 4.5],
-  ["foreground", "surface-muted", 4.5],
-  ["muted-foreground", "background", 4.5],
-  ["muted-foreground", "card", 4.5],
-  ["muted-foreground", "surface-muted", 4.5],
-  ["primary-foreground", "primary", 4.5],
-  ["accent-text", "background", 4.5],
-  ["accent-text", "card", 4.5],
-  ["accent-text", "accent-soft", 4.5],
-  ["primary", "background", 4.5],
-  ["primary", "card", 4.5],
-  ["vitoria-texto", "card", 4.5],
-  ["derrota-texto", "card", 4.5],
-  ["derrota-texto", "background", 4.5],
-  ["success", "success-soft", 4.5],
-  ["danger", "danger-soft", 4.5],
-  ["warning", "warning-soft", 4.5],
-  ["info", "info-soft", 4.5],
-  ["on-live", "live", 4.5],
-  ["destructive-foreground", "destructive", 4.5],
-  ["foreground", "success-soft", 4.5],
-  ["foreground", "danger-soft", 4.5],
-  ["foreground", "warning-soft", 4.5],
-  ["foreground", "info-soft", 4.5],
-  ["muted-foreground", "success-soft", 4.5],
-  ["muted-foreground", "warning-soft", 4.5],
-  ["ring", "background", 3],
-  ["ring", "card", 3],
-  ["border-strong", "background", 1.5],
+/** Pares de texto (4,5:1) que valem nos dois temas. As classes .win-text e .loss-text usam accent-text e loss. */
+const PARES: Array<[texto: string, fundo: string]> = [
+  ["foreground", "background"],
+  ["foreground", "card"],
+  ["foreground", "surface-muted"],
+  ["foreground", "secondary"],
+  ["muted-foreground", "background"],
+  ["muted-foreground", "card"],
+  ["muted-foreground", "surface-muted"],
+  ["muted-foreground", "secondary"],
+  ["primary-foreground", "primary"],
+  ["accent-text", "background"],
+  ["accent-text", "card"],
+  ["accent-text", "accent-soft"],
+  ["accent-text", "secondary"],
+  ["loss", "card"],
+  ["loss", "background"],
+  ["success", "success-soft"],
+  ["danger", "danger-soft"],
+  ["warning", "warning-soft"],
+  ["info", "info-soft"],
+  ["on-live", "live"],
+  ["destructive-foreground", "destructive"],
+  ["foreground", "success-soft"],
+  ["foreground", "danger-soft"],
+  ["foreground", "warning-soft"],
+  ["foreground", "info-soft"],
+  ["foreground", "accent-soft"],
+  ["muted-foreground", "success-soft"],
+  ["muted-foreground", "warning-soft"],
 ];
 
-describe("contraste da paleta escura", () => {
-  it.each(PARES)("%s sobre %s passa de %s:1", (texto, fundo, minimo) => {
-    expect(razao(cor(texto), cor(fundo))).toBeGreaterThanOrEqual(minimo);
+const TEMAS = [
+  { nome: "claro", v: bloco(":root"), contornoDoCampo: 3 },
+  { nome: "escuro", v: bloco(".dark"), contornoDoCampo: 1.5 },
+];
+
+describe.each(TEMAS)("contraste no tema $nome", ({ v, contornoDoCampo }) => {
+  it.each(PARES)("%s sobre %s passa de 4,5:1", (texto, fundo) => {
+    expect(razao(v[texto], v[fundo])).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("o anel de foco passa de 3:1 sobre o fundo e sobre a superfície", () => {
+    expect(razao(v.ring, v.background)).toBeGreaterThanOrEqual(3);
+    expect(razao(v.ring, v.card)).toBeGreaterThanOrEqual(3);
+  });
+
+  it("o contorno dos campos tem contraste suficiente com o fundo", () => {
+    expect(razao(v["border-strong"], v.background)).toBeGreaterThanOrEqual(contornoDoCampo);
+    expect(razao(v.input, v.background)).toBeGreaterThanOrEqual(contornoDoCampo);
   });
 
   it.each([1, 2, 3, 4, 5, 6])("chart-%i passa de 3:1 sobre a superfície", (n) => {
     expect(razao(v[`chart-${n}`], v.card)).toBeGreaterThanOrEqual(3);
+  });
+});
+
+describe("regras do dourado", () => {
+  it("o dourado puro só serve de preenchimento: no tema claro reprova como texto, e accent-text o substitui", () => {
+    const claro = bloco(":root");
+    expect(razao(claro.primary, claro.card)).toBeLessThan(3);
+    expect(razao(claro["accent-text"], claro.card)).toBeGreaterThanOrEqual(4.5);
   });
 });
