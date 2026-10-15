@@ -1,0 +1,23 @@
+name: Smoke pós-deploy
+
+# Depois de cada deploy de produção na Vercel, busca a imagem fixa do Time de teste e confere o hash.
+# Também pode ser rodado à mão. Variáveis opcionais do repositório (Settings > Variables):
+# SMOKE_LOGO_SHA256 (hash esperado) e SMOKE_TIME_TAG (padrão SMOKE).
+on:
+  deployment_status:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    if: github.event_name == 'workflow_dispatch' || (github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'Production')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Smoke
+        env:
+          SMOKE_LOGO_SHA256: ${{ vars.SMOKE_LOGO_SHA256 }}
+          SMOKE_TIME_TAG: ${{ vars.SMOKE_TIME_TAG }}
+        run: node scripts/smoke-pos-deploy.mjs
