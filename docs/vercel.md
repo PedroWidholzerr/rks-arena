@@ -18,7 +18,7 @@ Variável de ambiente (Production): `VITE_API_URL=/api`. O `vercel.json` reescre
 
 ## Antes de publicar
 
-1. Em `vercel.json`, troque `SERVICO-RENDER` pelo nome real do serviço no Render.
+1. `vercel.json` já aponta para `https://rks-arena-backend.onrender.com`.
 2. Conferir que `/readyz` do Render responde.
 
 ## Corte para a nova versão
