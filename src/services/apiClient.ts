@@ -101,6 +101,17 @@ export interface Requisicao {
   repetir?: "sempre" | "so-gateway";
 }
 
+/**
+ * Em produção a API é a rota /api da própria Vercel (rewrite para o Render). Um endereço absoluto em VITE_API_URL
+ * (como o do Railway, que foi desligado) é ignorado em produção: só um caminho relativo, como "/api", vale.
+ * Fora de produção, VITE_API_URL ou o backend local.
+ */
+export function enderecoDaApi(configurado: string | undefined, producao: boolean): string | undefined {
+  const valor = configurado?.trim();
+  if (!producao) return valor;
+  return valor && valor.startsWith("/") ? valor : "/api";
+}
+
 function resolverBase(bruta?: string): string {
   const limpa = (bruta ?? "").trim().replace(/\/+$/, "");
   if (!limpa) return "http://localhost:8081/api";
@@ -112,8 +123,7 @@ export class ApiClient {
   private aoSessaoExpirar: (() => void) | null = null;
 
   constructor(
-    // Em produção a API é a rota /api da própria Vercel (rewrite para o Render); VITE_API_URL só muda isso se existir.
-    private readonly base: string = resolverBase(import.meta.env.VITE_API_URL ?? (import.meta.env.PROD ? "/api" : undefined)),
+    private readonly base: string = resolverBase(enderecoDaApi(import.meta.env.VITE_API_URL, import.meta.env.PROD)),
     private readonly repeticao: OpcoesDeRepeticao = REPETICAO_PADRAO,
     private readonly buscar: typeof fetch = (entrada, init) => fetch(entrada, init),
   ) {

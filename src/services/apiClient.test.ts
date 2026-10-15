@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ApiClient, ErroDeApi, estadoDoServidor, type OpcoesDeRepeticao } from "./apiClient";
+import { ApiClient, ErroDeApi, enderecoDaApi, estadoDoServidor, type OpcoesDeRepeticao } from "./apiClient";
 
 /** Relógio e espera simulados: o teste "passa" 90 s sem esperar nada. */
 function relogioFalso() {
@@ -161,5 +161,21 @@ describe("ApiClient e cold start", () => {
     const cliente = new ApiClient("http://api.teste/api", relogio.opcoes, buscar as unknown as typeof fetch);
 
     await expect(cliente.requisitar("/admin/teams/1", { metodo: "DELETE", autenticada: true })).resolves.toBeUndefined();
+  });
+});
+
+describe("endereço da API", () => {
+  it("em produção ignora endereço absoluto (como o do Railway desligado) e usa /api", () => {
+    expect(enderecoDaApi("https://rks-arena-backend-production.up.railway.app", true)).toBe("/api");
+    expect(enderecoDaApi(undefined, true)).toBe("/api");
+    expect(enderecoDaApi("", true)).toBe("/api");
+  });
+  it("em produção aceita caminho relativo", () => {
+    expect(enderecoDaApi("/api", true)).toBe("/api");
+    expect(enderecoDaApi("/v2/api", true)).toBe("/v2/api");
+  });
+  it("fora de produção respeita VITE_API_URL", () => {
+    expect(enderecoDaApi("http://localhost:8082/api", false)).toBe("http://localhost:8082/api");
+    expect(enderecoDaApi(undefined, false)).toBeUndefined();
   });
 });
