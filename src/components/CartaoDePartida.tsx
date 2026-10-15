@@ -14,7 +14,7 @@ function LinhaDoTime({ time, jogos, vencedor }: { time: TimeResumo | null; jogos
       {vencedor ? <span aria-hidden="true" className="absolute inset-y-1 left-0 w-[3px] rounded-full bg-primary" /> : null}
       {time ? (
         <>
-          <Avatar src={null} texto={textoDoAvatarDoTime(time.tag)} tamanho={32} />
+          <Avatar src={time.logoUrl} texto={textoDoAvatarDoTime(time.tag)} tamanho={32} />
           <Link to={`/times/${time.id}`} className="min-w-0 flex-1 truncate">
             <span className="font-semibold">{time.tag}</span> <span className="font-normal text-muted-foreground">{time.nome}</span>
           </Link>

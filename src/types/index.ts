@@ -94,6 +94,7 @@ export interface TimeResumo {
   id: string;
   nome: string;
   tag: string;
+  logoUrl: string | null;
 }
 
 export type EstadoDaPartida = "AGENDADA" | "EM_ANDAMENTO" | "FINALIZADA" | "ANULADA";
