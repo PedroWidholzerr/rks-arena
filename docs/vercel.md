@@ -21,9 +21,8 @@ Variável de ambiente (Production): `VITE_API_URL=/api`. O `vercel.json` reescre
 1. `vercel.json` já aponta para `https://rks-arena-backend.onrender.com`.
 2. Conferir que `/readyz` do Render responde.
 
-## Corte para a nova versão
+## Corte para a nova versão (feito em 2026-10-15)
 
-**O Epic 1 não promove nada para produção.** Hoje o site publicado usa `VITE_API_URL` apontando direto para o backend antigo (Railway). Enquanto o código novo não for lançado, qualquer push na `main` gera deploy de produção. Por isso:
+O front novo foi publicado na `main`, o que gera o deploy de produção no projeto existente. Em produção o front usa `/api` por padrão (a rota da Vercel, que reescreve para o Render); a variável `VITE_API_URL` só vale se existir. **Se o projeto ainda tiver `VITE_API_URL` apontando para o Railway (já desligado), apague-a em *Settings → Environment Variables* e refaça o deploy.**
 
-- Não dar push da `main` neste repositório antes da história 2.34 (corte).
-- O corte efetivo (trocar `VITE_API_URL` para `/api`, publicar a `main` e conferir a produção) é a história 2.34, fora do Epic 1.
+Depois de cada deploy, o `smoke-pos-deploy.yml` confere o backend e a imagem fixa do Time `SMOKE` (crie esse Time com logo em produção e guarde o hash em `SMOKE_LOGO_SHA256`).

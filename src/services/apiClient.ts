@@ -112,7 +112,8 @@ export class ApiClient {
   private aoSessaoExpirar: (() => void) | null = null;
 
   constructor(
-    private readonly base: string = resolverBase(import.meta.env.VITE_API_URL),
+    // Em produção a API é a rota /api da própria Vercel (rewrite para o Render); VITE_API_URL só muda isso se existir.
+    private readonly base: string = resolverBase(import.meta.env.VITE_API_URL ?? (import.meta.env.PROD ? "/api" : undefined)),
     private readonly repeticao: OpcoesDeRepeticao = REPETICAO_PADRAO,
     private readonly buscar: typeof fetch = (entrada, init) => fetch(entrada, init),
   ) {
