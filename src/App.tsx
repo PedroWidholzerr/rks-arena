@@ -1,67 +1,78 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ThemeProvider } from "next-themes";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import LayoutAdmin from "@/components/layout/LayoutAdmin";
+import LayoutPublico from "@/components/layout/LayoutPublico";
+import { RotaAdmin } from "@/components/layout/RotaAdmin";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
-import Layout from "@/components/layout/Layout";
-import AdminLayout from "@/components/admin/AdminLayout";
-import Index from "./pages/Index";
-import ChampionshipsPage from "./pages/ChampionshipsPage";
-import ChampionshipDetailPage from "./pages/ChampionshipDetailPage";
-import TeamsPage from "./pages/TeamsPage";
-import TeamDetailPage from "./pages/TeamDetailPage";
-import PlayersPage from "./pages/PlayersPage";
-import PlayerDetailPage from "./pages/PlayerDetailPage";
-import LoginPage from "./pages/LoginPage";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import ManageSeasons from "./pages/admin/ManageSeasons";
-import ManageChampionships from "./pages/admin/ManageChampionships";
-import ManageTeams from "./pages/admin/ManageTeams";
-import ManagePlayers from "./pages/admin/ManagePlayers";
-import ManageMatches from "./pages/admin/ManageMatches";
-import NotFound from "./pages/NotFound";
+import Agenda from "@/pages/Agenda";
+import { DetalheDoCampeonato, ListaDeCampeonatos } from "@/pages/Campeonatos";
+import Entrar from "@/pages/Entrar";
+import Inicio from "@/pages/Inicio";
+import { DetalheDoJogador, ListaDeJogadores } from "@/pages/Jogadores";
+import NaoEncontrada from "@/pages/NaoEncontrada";
+import { DetalheDaTemporada, ListaDeTemporadas } from "@/pages/Temporadas";
+import { DetalheDoTime, ListaDeTimes } from "@/pages/Times";
+import TrocarSenha from "@/pages/TrocarSenha";
+import { AdminAdministradores } from "@/pages/admin/AdminAdministradores";
+import { AdminCampeonato, AdminCampeonatos } from "@/pages/admin/AdminCampeonatos";
+import { AdminFases } from "@/pages/admin/AdminFases";
+import { AdminInscricoes } from "@/pages/admin/AdminInscricoes";
+import { AdminJogadores } from "@/pages/admin/AdminJogadores";
+import { AdminPartidas } from "@/pages/admin/AdminPartidas";
+import { AdminPendencias } from "@/pages/admin/AdminPendencias";
+import { AdminTimes } from "@/pages/admin/AdminTimes";
 
-const queryClient = new QueryClient();
+// A repetição para o cold start é do apiClient; aqui o React Query não repete por conta própria.
+const clienteDeConsultas = new QueryClient({
+  defaultOptions: { queries: { retry: false, staleTime: 30_000, refetchOnWindowFocus: true } },
+});
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route element={<Layout />}>
-              <Route path="/" element={<Index />} />
-              <Route path="/championships" element={<ChampionshipsPage />} />
-              <Route path="/championships/:id" element={<ChampionshipDetailPage />} />
-              <Route path="/teams" element={<TeamsPage />} />
-              <Route path="/teams/:id" element={<TeamDetailPage />} />
-              <Route path="/players" element={<PlayersPage />} />
-              <Route path="/players/:id" element={<PlayerDetailPage />} />
-            </Route>
-            <Route path="/login" element={<LoginPage />} />
-            <Route
-              element={
-                <ProtectedRoute>
-                  <AdminLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/admin/seasons" element={<ManageSeasons />} />
-              <Route path="/admin/championships" element={<ManageChampionships />} />
-              <Route path="/admin/teams" element={<ManageTeams />} />
-              <Route path="/admin/players" element={<ManagePlayers />} />
-              <Route path="/admin/matches" element={<ManageMatches />} />
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
+  <QueryClientProvider client={clienteDeConsultas}>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem storageKey="rks-tema">
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster position="bottom-center" />
+          <BrowserRouter>
+            <Routes>
+              <Route element={<LayoutPublico />}>
+                <Route path="/" element={<Inicio />} />
+                <Route path="/temporadas" element={<ListaDeTemporadas />} />
+                <Route path="/temporadas/:id" element={<DetalheDaTemporada />} />
+                <Route path="/campeonatos" element={<ListaDeCampeonatos />} />
+                <Route path="/campeonatos/:id" element={<DetalheDoCampeonato />} />
+                <Route path="/agenda" element={<Agenda />} />
+                <Route path="/times" element={<ListaDeTimes />} />
+                <Route path="/times/:id" element={<DetalheDoTime />} />
+                <Route path="/jogadores" element={<ListaDeJogadores />} />
+                <Route path="/jogadores/:id" element={<DetalheDoJogador />} />
+              </Route>
+              <Route path="/entrar" element={<Entrar />} />
+              <Route path="/troque-sua-senha" element={<TrocarSenha />} />
+              <Route element={<RotaAdmin />}>
+                <Route element={<LayoutAdmin />}>
+                  <Route path="/admin" element={<AdminPendencias />} />
+                  <Route path="/admin/campeonatos" element={<AdminCampeonatos />} />
+                  <Route path="/admin/campeonatos/:id" element={<AdminCampeonato />} />
+                  <Route path="/admin/fases" element={<AdminFases />} />
+                  <Route path="/admin/partidas" element={<AdminPartidas />} />
+                  <Route path="/admin/inscricoes" element={<AdminInscricoes />} />
+                  <Route path="/admin/times" element={<AdminTimes />} />
+                  <Route path="/admin/jogadores" element={<AdminJogadores />} />
+                  <Route path="/admin/administradores" element={<AdminAdministradores />} />
+                </Route>
+              </Route>
+              <Route element={<LayoutPublico />}>
+                <Route path="*" element={<NaoEncontrada />} />
+              </Route>
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 
